@@ -1,5 +1,6 @@
 package ru.practicum.explore.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -20,5 +21,6 @@ public class EndpointHitDto {
     @NotBlank
     private String ip;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private String timestamp;
 }
