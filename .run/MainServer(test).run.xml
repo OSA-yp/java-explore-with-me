@@ -1,7 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="MainServer" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+  <configuration default="false" name="MainServer(test)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="test" />
     <module name="ewm-service" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="ru.practicum.explore.server.MainServer" />
+    <option name="VM_PARAMETERS" value="-Dspring.profiles.active=test" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
