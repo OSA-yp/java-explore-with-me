@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import ru.practicum.explore.dto.EndpointHitDto;
+import ru.practicum.explore.dto.ViewStatsDto;
 
 import java.util.List;
 
@@ -28,7 +30,7 @@ public class StatsClient {
                 .toBodilessEntity();
     }
 
-    public List<ViewStats> getStats(String start, String end, List<String> uris, Boolean unique) {
+    public List<ViewStatsDto> getStats(String start, String end, List<String> uris, Boolean unique) {
         if (start == null || end == null) {
             throw new IllegalArgumentException("Дата и время начала и окончания диапазона должны быть указаны");
         }
