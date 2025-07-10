@@ -9,6 +9,7 @@ import ru.practicum.explore.stats.service.HitsService;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -38,6 +39,11 @@ public class StatsController {
 
             @RequestParam(name = "unique", defaultValue = "false") boolean unique
     ) {
+
+        if (uris == null || uris.isEmpty()) {
+            uris = Collections.emptyList();
+        }
+
         return hitService.findStats(start, end, uris, unique);
     }
 }

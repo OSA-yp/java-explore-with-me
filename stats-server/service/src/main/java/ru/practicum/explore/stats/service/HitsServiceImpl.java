@@ -32,10 +32,23 @@ public class HitsServiceImpl implements HitsService {
             throw new ValidationException("End time must be after start time");
         }
 
+
         if (unique) {
-            return statsMapper.toViewStats(hitRepository.findUniqueStatsByRangeAndUris(start, end, uris));
+
+            if (uris.isEmpty()) {
+                return statsMapper.toViewStats(hitRepository.findUniqueStatsByRangeWithoutUris(start, end));
+            } else {
+                return statsMapper.toViewStats(hitRepository.findUniqueStatsByRangeAndUris(start, end, uris));
+            }
+
+
         } else {
-            return statsMapper.toViewStats(hitRepository.findStatsByRangeAndUris(start, end, uris));
+            if (uris.isEmpty()) {
+                return statsMapper.toViewStats(hitRepository.findStatsByRangeWithoutUris(start, end));
+            } else {
+                return statsMapper.toViewStats(hitRepository.findStatsByRangeAndUris(start, end, uris));
+            }
+
         }
     }
 }

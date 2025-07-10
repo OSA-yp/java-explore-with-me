@@ -5,7 +5,7 @@
     import lombok.NoArgsConstructor;
 
     @Data
-    @NoArgsConstructor
+//    @NoArgsConstructor
     @AllArgsConstructor
     public class ViewStatsDto {
         private String app;
