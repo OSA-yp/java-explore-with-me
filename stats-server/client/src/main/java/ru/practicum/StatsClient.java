@@ -10,8 +10,6 @@ import ru.practicum.exception.StatsServiceException;
 import ru.practicum.explore.dto.EndpointHitDto;
 import ru.practicum.explore.dto.ViewStatsDto;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
