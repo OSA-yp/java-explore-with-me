@@ -1,388 +1,562 @@
 {
 	"info": {
-		"_postman_id": "2727ee6b-c606-49ec-9d4b-549c21dbe7ae",
-		"name": "Tests for detatched stats service",
+		"name": "Combined Stats Service Tests",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "23073145"
+		"_postman_id": "2727ee6b-c606-49ec-9d4b-549c21dbe7ae"
 	},
 	"item": [
 		{
-			"name": "Получение статистики по посещениям. (Тест на опциональность параметра uris)",
-			"event": [
+			"name": "Send Hit",
+			"item": [
 				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"const main = async () => {\r",
-							"    const api = new API(pm);\r",
-							"    const rnd = new RandomUtils();\r",
-							"\r",
-							"    try {    \r",
-							"        pm.collectionVariables.set(\"uri\", '/events');  \r",
-							"        let post1 = rnd.getPost();\r",
-							"        let post2 = rnd.getPost();\r",
-							"        post1['uri'] = '/events';\r",
-							"        post2['uri'] = '/events/5';\r",
-							"        await api.addPost(post1);\r",
-							"        await api.addPost(post2);\r",
-							"\r",
-							"        let source = await api.getPosts(['/events']);\r",
-							"        pm.collectionVariables.set('source', source);\r",
-							"        \r",
-							"    } catch(err) {\r",
-							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-							"    }\r",
-							"};\r",
-							"\r",
-							"const interval = setInterval(() => {}, 1000);\r",
-							"\r",
-							"setTimeout(async () => \r",
-							"    {\r",
-							"        try {\r",
-							"            await main();\r",
-							"        } catch (e) {\r",
-							"            console.error(e);\r",
-							"        } finally {\r",
-							"            clearInterval(interval);\r",
-							"        }\r",
-							"    },  \r",
-							"    100 \r",
-							");"
+					"name": "Valid Hit Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
-						"type": "text/javascript"
-					}
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"app\": \"ewm-main-service\",\n  \"uri\": \"/events/1\",\n  \"ip\": \"192.168.1.1\",\n  \"timestamp\": \"2023-12-31 15:30:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/hit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hit"
+							]
+						}
+					},
+					"response": []
 				},
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json при запросе без опционального параметра uris\", function () {\r",
-							"    pm.response.to.be.ok;    \r",
-							"    pm.response.to.be.withBody;\r",
-							"    pm.response.to.be.json;\r",
-							"});\r",
-							"\r",
-							"const target = pm.response.json();\r",
-							"const source = pm.collectionVariables.get('source');\r",
-							"\r",
-							"pm.test(\"При запросе по конкретному uris должны получить 1 запись\", function () {\r",
-							"    pm.expect(source.length).to.equal(1);\r",
-							"});\r",
-							"\r",
-							"pm.test(\"При запросе без uris должны получить больше 1 записи\", function () {\r",
-							"    pm.expect(target.length).to.be.above(1);\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Посты должны содержать поля: app, uri, hits\", function () {\r",
-							"    pm.expect(target[0]).to.have.all.keys('app', 'uri', 'hits');\r",
-							"    pm.expect(target[1]).to.have.all.keys('app', 'uri', 'hits');\r",
-							"    pm.expect(source[0]).to.have.all.keys('app', 'uri', 'hits');\r",
-							"});"
+					"name": "Invalid Hit Request - Missing App",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
 						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"url": {
-					"raw": "{{baseUrl}}/stats?start=2020-05-05 00:00:00&end=2035-05-05 00:00:00&unique=false",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"stats"
-					],
-					"query": [
-						{
-							"key": "start",
-							"value": "2020-05-05 00:00:00",
-							"description": "(Required) Дата и время начала диапазона за который нужно выгрузить статистику (в формате \"yyyy-MM-dd HH:mm:ss\")"
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"uri\": \"/events/1\",\n  \"ip\": \"192.168.1.1\",\n  \"timestamp\": \"2023-12-31 15:30:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
-						{
-							"key": "end",
-							"value": "2035-05-05 00:00:00",
-							"description": "(Required) Дата и время конца диапазона за который нужно выгрузить статистику (в формате \"yyyy-MM-dd HH:mm:ss\")"
-						},
-						{
-							"key": "uris",
-							"value": "{{uri}}",
-							"description": "Список uri для которых нужно выгрузить статистику",
-							"disabled": true
-						},
-						{
-							"key": "uris",
-							"value": "aliqua o",
-							"description": "Список uri для которых нужно выгрузить статистику",
-							"disabled": true
-						},
-						{
-							"key": "unique",
-							"value": "false",
-							"description": "Нужно ли учитывать только уникальные посещения (только с уникальным ip)"
+						"url": {
+							"raw": "{{base_url}}/hit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hit"
+							]
 						}
-					]
+					},
+					"response": []
+				},
+				{
+					"name": "Test Hit Validation - Invalid URI Length",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"app\": \"ewm-main-service\",\n  \"uri\": \"/events/\" + \"a\".repeat(1025),\n  \"ip\": \"192.168.1.1\",\n  \"timestamp\": \"2023-12-31 15:30:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/hit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Test Hit Validation - Invalid Timestamp Format",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"app\": \"ewm-main-service\",\n  \"uri\": \"/events/1\",\n  \"ip\": \"192.168.1.1\",\n  \"timestamp\": \"31-12-2023 15:30:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/hit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"hit"
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		},
 		{
-			"name": "Получение статистики по посещениям. (Тест на опциональность и работу параметра unique)",
-			"event": [
+			"name": "Get Stats",
+			"item": [
 				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"const main = async () => {\r",
-							"    const api = new API(pm);\r",
-							"    const rnd = new RandomUtils();\r",
-							"\r",
-							"    try {    \r",
-							"        pm.collectionVariables.set(\"uri\", '/events');  \r",
-							"        let post = rnd.getPost();\r",
-							"        post['uri'] = '/events';\r",
-							"        await api.addPost(post);\r",
-							"        await api.addPost(post);\r",
-							"        await api.addPost(post);\r",
-							"        \r",
-							"        let source = await api.getPosts(['/events']);\r",
-							"        pm.collectionVariables.set('source', source);\r",
-							"\r",
-							"    } catch(err) {\r",
-							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-							"    }\r",
-							"};\r",
-							"\r",
-							"const interval = setInterval(() => {}, 1000);\r",
-							"\r",
-							"setTimeout(async () => \r",
-							"    {\r",
-							"        try {\r",
-							"            await main();\r",
-							"        } catch (e) {\r",
-							"            console.error(e);\r",
-							"        } finally {\r",
-							"            clearInterval(interval);\r",
-							"        }\r",
-							"    },  \r",
-							"    100 \r",
-							");"
-						],
-						"type": "text/javascript"
-					}
+					"name": "Valid Stats Request",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/stats?start=2023-12-01 00:00:00&end=2023-12-31 23:59:59&uris=/events/1,/events/2&unique=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"stats"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2023-12-01 00:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2023-12-31 23:59:59"
+								},
+								{
+									"key": "uris",
+									"value": "/events/1,/events/2"
+								},
+								{
+									"key": "unique",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
 				},
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json при запросе без опционального параметра unique\", function () {\r",
-							"    pm.response.to.be.ok;    \r",
-							"    pm.response.to.be.withBody;\r",
-							"    pm.response.to.be.json;\r",
-							"});\r",
-							"\r",
-							"const target = pm.response.json()[0];\r",
-							"const source = pm.collectionVariables.get('source')[0];\r",
-							"\r",
-							"pm.test(\"При запросе с unique==true должен быть всего 1 уникальный запрос\", function () {\r",
-							"    pm.expect(target.hits).to.equal(1);\r",
-							"});\r",
-							"\r",
-							"pm.test(\"При запросе без uniqre должны получить минимум 3 запроса(поскольку делали 3)\", function () {\r",
-							"    pm.expect(source.hits).to.be.above(2);\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Посты должны содержать поля: app, uri, hits\", function () {\r",
-							"    pm.expect(target).to.have.all.keys('app', 'uri', 'hits');\r",
-							"    pm.expect(source).to.have.all.keys('app', 'uri', 'hits');\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"url": {
-					"raw": "{{baseUrl}}/stats?start=2020-05-05 00:00:00&end=2035-05-05 00:00:00&uris={{uri}}&unique=true",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"stats"
-					],
-					"query": [
-						{
-							"key": "start",
-							"value": "2020-05-05 00:00:00",
-							"description": "(Required) Дата и время начала диапазона за который нужно выгрузить статистику (в формате \"yyyy-MM-dd HH:mm:ss\")"
-						},
-						{
-							"key": "end",
-							"value": "2035-05-05 00:00:00",
-							"description": "(Required) Дата и время конца диапазона за который нужно выгрузить статистику (в формате \"yyyy-MM-dd HH:mm:ss\")"
-						},
-						{
-							"key": "uris",
-							"value": "{{uri}}",
-							"description": "Список uri для которых нужно выгрузить статистику"
-						},
-						{
-							"key": "uris",
-							"value": "aliqua o",
-							"description": "Список uri для которых нужно выгрузить статистику",
-							"disabled": true
-						},
-						{
-							"key": "unique",
-							"value": "true",
-							"description": "Нужно ли учитывать только уникальные посещения (только с уникальным ip)"
+					"name": "Stats Request Without Uris",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/stats?start=2023-12-01 00:00:00&end=2023-12-31 23:59:59&unique=false",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"stats"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2023-12-01 00:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2023-12-31 23:59:59"
+								},
+								{
+									"key": "unique",
+									"value": "false"
+								}
+							]
 						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Тест корреткной работы сохранения и просмотра количества просмотров",
-			"event": [
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"const main = async () => {\r",
-							"    const api = new API(pm);\r",
-							"    const rnd = new RandomUtils();\r",
-							"\r",
-							"    try {\r",
-							"        pm.collectionVariables.set(\"uri\", '/events/1&uris=/events/2');\r",
-							"        let post1 = rnd.getPost();\r",
-							"        let post2 = rnd.getPost();\r",
-							"        post1['uri'] = '/events/1';\r",
-							"        post2['uri'] = '/events/2';\r",
-							"        await api.addPost(post1);\r",
-							"        await api.addPost(post2);\r",
-							"        await api.addPost(post2);\r",
-							"        let source = await api.getPosts(['/events/1', '/events/2']);\r",
-							"        await api.addPost(post1);\r",
-							"        await api.addPost(post2);\r",
-							"        pm.collectionVariables.set('source', source);\r",
-							"        \r",
-							"    } catch(err) {\r",
-							"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
-							"    }\r",
-							"};\r",
-							"\r",
-							"const interval = setInterval(() => {}, 1000);\r",
-							"\r",
-							"setTimeout(async () => \r",
-							"    {\r",
-							"        try {\r",
-							"            await main();\r",
-							"        } catch (e) {\r",
-							"            console.error(e);\r",
-							"        } finally {\r",
-							"            clearInterval(interval);\r",
-							"        }\r",
-							"    },  \r",
-							"    100 \r",
-							");"
-						],
-						"type": "text/javascript"
-					}
+					},
+					"response": []
 				},
 				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
-							"    pm.response.to.be.ok;    \r",
-							"    pm.response.to.be.withBody;\r",
-							"    pm.response.to.be.json;\r",
-							"});\r",
-							"\r",
-							"const target = pm.response.json();\r",
-							"const source = pm.collectionVariables.get('source');\r",
-							"\r",
-							"\r",
-							"pm.test(\"Посты должны содержать поля: app, uri, hits\", function () {\r",
-							"    pm.expect(target[0]).to.have.all.keys('app', 'uri', 'hits');\r",
-							"    pm.expect(target[1]).to.have.all.keys('app', 'uri', 'hits');\r",
-							"});\r",
-							"\r",
-							"pm.test(\"В теле ответа должна соблюдаться сортировка по убыванию количества просмотров\", function(){\r",
-							"    pm.expect(target[0].hits).to.be.above(target[1].hits);\r",
-							"});\r",
-							"\r",
-							"pm.test(\"Проверка соответствия реального количества просмотров событий и сохраненных хитов\", function(){\r",
-							"    pm.expect(source[0].hits+1).equal(target[0].hits);\r",
-							"    pm.expect(source[1].hits+1).equal(target[1].hits);\r",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Accept",
-						"value": "application/json"
-					}
-				],
-				"url": {
-					"raw": "{{baseUrl}}/stats?start=2020-05-05 00:00:00&end=2035-05-05 00:00:00&uris={{uri}}",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"stats"
-					],
-					"query": [
-						{
-							"key": "start",
-							"value": "2020-05-05 00:00:00",
-							"description": "(Required) Дата и время начала диапазона за который нужно выгрузить статистику (в формате \"yyyy-MM-dd HH:mm:ss\")"
-						},
-						{
-							"key": "end",
-							"value": "2035-05-05 00:00:00",
-							"description": "(Required) Дата и время конца диапазона за который нужно выгрузить статистику (в формате \"yyyy-MM-dd HH:mm:ss\")"
-						},
-						{
-							"key": "uris",
-							"value": "{{uri}}",
-							"description": "Список uri для которых нужно выгрузить статистику"
-						},
-						{
-							"key": "uris",
-							"value": "aliqua o",
-							"description": "Список uri для которых нужно выгрузить статистику",
-							"disabled": true
-						},
-						{
-							"key": "unique",
-							"value": "false",
-							"description": "Нужно ли учитывать только уникальные посещения (только с уникальным ip)",
-							"disabled": true
+					"name": "Invalid Stats Request - Missing Dates",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"stats"
+							]
 						}
-					]
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid Stats Request - End Before Start",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/stats?start=2023-12-31 23:59:59&end=2023-12-01 00:00:00",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"stats"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2023-12-31 23:59:59"
+								},
+								{
+									"key": "end",
+									"value": "2023-12-01 00:00:00"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Test Stats Client - Multiple Hits Same URI",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const main = async () => {",
+									"    const api = new API(pm);",
+									"    const rnd = new RandomUtils();",
+									"    ",
+									"    try {    ",
+									"        pm.collectionVariables.set(\"test_uri\", '/test/multiple');",
+									"        ",
+									"        // Send 3 hits with same URI but different IPs",
+									"        let hit1 = rnd.getPost();",
+									"        hit1.uri = pm.collectionVariables.get('test_uri');",
+									"        hit1.ip = '192.168.1.1';",
+									"        ",
+									"        let hit2 = rnd.getPost();",
+									"        hit2.uri = pm.collectionVariables.get('test_uri');",
+									"        hit2.ip = '192.168.1.2';",
+									"        ",
+									"        let hit3 = rnd.getPost();",
+									"        hit3.uri = pm.collectionVariables.get('test_uri');",
+									"        hit3.ip = '192.168.1.1'; // Same IP as hit1",
+									"        ",
+									"        await api.addPost(hit1);",
+									"        await api.addPost(hit2);",
+									"        await api.addPost(hit3);",
+									"    } catch(err) {",
+									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
+									"    }",
+									"};",
+									"",
+									"const interval = setInterval(() => {}, 1000);",
+									"",
+									"setTimeout(async () => ",
+									"    {",
+									"        try {",
+									"            await main();",
+									"        } catch (e) {",
+									"            console.error(e);",
+									"        } finally {",
+									"            clearInterval(interval);",
+									"        }",
+									"    },  ",
+									"    100 ",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response should be 200 OK\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response should be JSON\", function() {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"const stats = pm.response.json();",
+									"const testUri = pm.collectionVariables.get('test_uri');",
+									"const testStat = stats.find(s => s.uri === testUri);",
+									"",
+									"pm.test(\"Should find stats for test URI\", function() {",
+									"    pm.expect(testStat).to.exist;",
+									"});",
+									"",
+									"pm.test(\"With unique=true should count 2 hits (from 2 unique IPs)\", function() {",
+									"    pm.expect(testStat.hits).to.equal(2);",
+									"});",
+									"",
+									"// Additional request without unique flag",
+									"pm.sendRequest({",
+									"    url: pm.variables.replaceIn('{{base_url}}/stats?start=2020-01-01 00:00:00&end=2030-01-01 00:00:00&uris={{test_uri}}'),",
+									"    method: 'GET',",
+									"}, function(err, response) {",
+									"    pm.test(\"Second request should be successful\", function() {",
+									"        pm.expect(err).to.be.null;",
+									"        pm.expect(response).to.have.property('code', 200);",
+									"    });",
+									"    ",
+									"    const nonUniqueStats = response.json();",
+									"    const nonUniqueStat = nonUniqueStats.find(s => s.uri === testUri);",
+									"    ",
+									"    pm.test(\"With unique=false should count 3 hits (all requests)\", function() {",
+									"        pm.expect(nonUniqueStat.hits).to.equal(3);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/stats?start=2020-01-01 00:00:00&end=2030-01-01 00:00:00&uris={{test_uri}}&unique=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"stats"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2020-01-01 00:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2030-01-01 00:00:00"
+								},
+								{
+									"key": "uris",
+									"value": "{{test_uri}}"
+								},
+								{
+									"key": "unique",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Test Stats Client - Empty Response",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response should be 200 OK\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response should be JSON\", function() {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test(\"Response should be empty array for non-existing URIs\", function() {",
+									"    const stats = pm.response.json();",
+									"    pm.expect(stats).to.be.an('array').that.is.empty;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/stats?start=2020-01-01 00:00:00&end=2030-01-01 00:00:00&uris=/non/existing/uri",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"stats"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2020-01-01 00:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2030-01-01 00:00:00"
+								},
+								{
+									"key": "uris",
+									"value": "/non/existing/uri"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Test Stats Client - Sorting",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const main = async () => {",
+									"    const api = new API(pm);",
+									"    const rnd = new RandomUtils();",
+									"    ",
+									"    try {    ",
+									"        pm.collectionVariables.set(\"uri1\", '/test/sorting/1');",
+									"        pm.collectionVariables.set(\"uri2\", '/test/sorting/2');",
+									"        ",
+									"        // Send hits - uri1 should have more hits",
+									"        let hit1 = rnd.getPost();",
+									"        hit1.uri = pm.collectionVariables.get('uri1');",
+									"        ",
+									"        let hit2 = rnd.getPost();",
+									"        hit2.uri = pm.collectionVariables.get('uri2');",
+									"        ",
+									"        // Send 3 hits for uri1 and 1 hit for uri2",
+									"        await api.addPost(hit1);",
+									"        await api.addPost(hit1);",
+									"        await api.addPost(hit1);",
+									"        await api.addPost(hit2);",
+									"    } catch(err) {",
+									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);",
+									"    }",
+									"};",
+									"",
+									"const interval = setInterval(() => {}, 1000);",
+									"",
+									"setTimeout(async () => ",
+									"    {",
+									"        try {",
+									"            await main();",
+									"        } catch (e) {",
+									"            console.error(e);",
+									"        } finally {",
+									"            clearInterval(interval);",
+									"        }",
+									"    },  ",
+									"    100 ",
+									");"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response should be 200 OK\", function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response should be JSON\", function() {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"const stats = pm.response.json();",
+									"const uri1 = pm.collectionVariables.get('uri1');",
+									"const uri2 = pm.collectionVariables.get('uri2');",
+									"",
+									"pm.test(\"Should return 2 stats entries\", function() {",
+									"    pm.expect(stats).to.have.lengthOf(2);",
+									"});",
+									"",
+									"pm.test(\"Stats should be sorted by hits in descending order\", function() {",
+									"    pm.expect(stats[0].hits).to.be.greaterThan(stats[1].hits);",
+									"    pm.expect(stats[0].uri).to.equal(uri1);",
+									"    pm.expect(stats[1].uri).to.equal(uri2);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/stats?start=2020-01-01 00:00:00&end=2030-01-01 00:00:00&uris={{uri1}},{{uri2}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"stats"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2020-01-01 00:00:00"
+								},
+								{
+									"key": "end",
+									"value": "2030-01-01 00:00:00"
+								},
+								{
+									"key": "uris",
+									"value": "{{uri1}},{{uri2}}"
+								}
+							]
+						}
+					},
+					"response": []
 				}
-			},
-			"response": []
+			]
 		}
 	],
 	"event": [
@@ -403,7 +577,7 @@
 					"    }",
 					"",
 					"    async getPosts(uris=null, verbose=null) {",
-					"        return this.get(uris == null ? \"/stats?start=2020-05-05 00:00:00&end=2035-05-05 00:00:00\" : \"/stats?start=2020-05-05 00:00:00&end=2035-05-05 00:00:00&uris=\"+uris.join('&uris='), null, \"Ошибка при сохранении информации о запросе к эндпойнту: \", verbose);",
+					"        return this.get(uris == null ? \"/stats?start=2020-05-05 00:00:00&end=2030-05-05 00:00:00\" : \"/stats?start=2020-05-05 00:00:00&end=2030-05-05 00:00:00&uris=\"+uris.join('&uris='), null, \"Ошибка при сохранении информации о запросе к эндпойнту: \", verbose);",
 					"    }",
 					"",
 					"    async post(path, body, errorText = \"Ошибка при выполнении post-запроса: \", verbose=null) {",
@@ -482,7 +656,6 @@
 					"",
 					"        return m.format('YYYY-MM-DD HH:mm:ss');",
 					"    }",
-					"",
 					"}"
 				]
 			}
@@ -490,16 +663,63 @@
 		{
 			"listen": "test",
 			"script": {
-				"type": "text/javascript",
 				"exec": [
-					""
-				]
+					"// Tests for Send Hit endpoint",
+					"if (pm.info.requestName === 'Valid Hit Request') {",
+					"    pm.test(\"Valid Hit Request - Status code is 200\", function() {",
+					"        pm.response.to.have.status(200);",
+					"    });",
+					"}",
+					"",
+					"if (pm.info.requestName === 'Invalid Hit Request - Missing App') {",
+					"    pm.test(\"Invalid Hit Request - Status code is 500\", function() {",
+					"        pm.response.to.have.status(500);",
+					"    });",
+					"}",
+					"",
+					"if (pm.info.requestName === 'Test Hit Validation - Invalid URI Length') {",
+					"    pm.test(\"Should return 400 for URI longer than 1024 chars\", function() {",
+					"        pm.response.to.have.status(400);",
+					"    });",
+					"}",
+					"",
+					"if (pm.info.requestName === 'Test Hit Validation - Invalid Timestamp Format') {",
+					"    pm.test(\"Should return 500 for invalid timestamp format\", function() {",
+					"        pm.response.to.have.status(500);",
+					"    });",
+					"}",
+					"",
+					"// Tests for Get Stats endpoint",
+					"if (pm.info.requestName === 'Valid Stats Request' || pm.info.requestName === 'Stats Request Without Uris') {",
+					"    pm.test(\"Status code is 200\", function() {",
+					"        pm.response.to.have.status(200);",
+					"    });",
+					"    ",
+					"    pm.test(\"Returns array\", function() {",
+					"        pm.response.to.be.json;",
+					"        pm.expect(pm.response.json()).to.be.an('array');",
+					"    });",
+					"}",
+					"",
+					"if (pm.info.requestName === 'Invalid Stats Request - Missing Dates') {",
+					"    pm.test(\"Status code is 400\", function() {",
+					"        pm.response.to.have.status(400);",
+					"    });",
+					"}",
+					"",
+					"if (pm.info.requestName === 'Invalid Stats Request - End Before Start') {",
+					"    pm.test(\"Status code is 400\", function() {",
+					"        pm.response.to.have.status(400);",
+					"    });",
+					"}"
+				],
+				"type": "text/javascript"
 			}
 		}
 	],
 	"variable": [
 		{
-			"key": "baseUrl",
+			"key": "base_url",
 			"value": "http://localhost:9090",
 			"type": "string"
 		},
@@ -509,6 +729,18 @@
 		},
 		{
 			"key": "source",
+			"value": ""
+		},
+		{
+			"key": "test_uri",
+			"value": ""
+		},
+		{
+			"key": "uri1",
+			"value": ""
+		},
+		{
+			"key": "uri2",
 			"value": ""
 		}
 	]
