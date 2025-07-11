@@ -55,8 +55,8 @@ public class StatsClient {
             List<ViewStatsDto> stats = restClient.get()
                     .uri(uriBuilder -> {
                         uriBuilder.path(STATS_ENDPOINT)
-                                .queryParam("start", encodeDateTime(start))
-                                .queryParam("end", encodeDateTime(end))
+                                .queryParam("start", start)
+                                .queryParam("end", end)
                                 .queryParam("unique", Boolean.TRUE.equals(unique));
 
                         if (uris != null && !uris.isEmpty()) {
@@ -92,9 +92,5 @@ public class StatsClient {
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Неверный формат даты. Ожидается yyyy-MM-dd HH:mm:ss", e);
         }
-    }
-
-    private String encodeDateTime(String dateTime) {
-        return URLEncoder.encode(dateTime, StandardCharsets.UTF_8);
     }
 }
