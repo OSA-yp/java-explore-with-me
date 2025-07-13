@@ -1,6 +1,6 @@
 
 -- Таблица категорий
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
                             id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
                             name VARCHAR(50) NOT NULL UNIQUE
 );
