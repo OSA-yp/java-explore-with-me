@@ -55,6 +55,7 @@ public class UsersController {
     }
 
     @DeleteMapping("/admin/users/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUserById(@PathVariable Long userId,
                                HttpServletRequest request) {
 
