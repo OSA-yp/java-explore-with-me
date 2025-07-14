@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ru.practicum.explore.server.exception.ConflictException;
 import ru.practicum.explore.server.exception.NotFoundException;
 import ru.practicum.explore.server.exception.ValidationException;
 import ru.practicum.explore.server.users.dal.UserMapper;
@@ -80,7 +81,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> maybeUser = userRepository.getUserByEmail(email);
 
         if (maybeUser.isPresent()) {
-            throw new ValidationException("User with email " + email + " already exist");
+            throw new ConflictException("User with email " + email + " already exist");
         }
     }
 }
