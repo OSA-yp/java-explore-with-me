@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.explore.server.exception.NotFoundException;
+import ru.practicum.explore.server.exception.ValidationException;
 import ru.practicum.explore.server.users.dal.UserMapper;
 import ru.practicum.explore.server.users.dal.UserRepository;
 import ru.practicum.explore.server.users.dto.UserResponseDto;
@@ -25,12 +26,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto addUser(User user) {
 
+        checkEmailExisting(user.getEmail());
+
         User newUser = userRepository.save(user);
 
         log.info("User with id={} was created", newUser.getId());
 
         return UserMapper.toUserResponseDto(newUser);
     }
+
+
 
     @Override
     public Collection<UserResponseDto> getUsers(Collection<Long> ids, Integer from, Integer size) {
@@ -69,6 +74,13 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("User with id=" + userId + " was not found");
 
         }
+    }
+    private void checkEmailExisting(String email) {
 
+        Optional<User> maybeUser = userRepository.getUserByEmail(email);
+
+        if (maybeUser.isPresent()) {
+            throw new ValidationException("User with email " + email + " already exist");
+        }
     }
 }
