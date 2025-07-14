@@ -62,7 +62,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponseDto update(long id, UpdateCategoryDto dto) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Категория с id = " + id + " не найдена"));
-        if (categoryRepository.existsByName(dto.getName())) {
+        if (categoryRepository.existsByNameIgnoreCaseAndIdNot(dto.getName(), id)) {
             throw new ConflictException("Категория с таким именем уже есть");
         }
         CategoryMapper.updateCategory(category, dto);
