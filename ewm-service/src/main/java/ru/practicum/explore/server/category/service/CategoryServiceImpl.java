@@ -1,4 +1,4 @@
-package ru.practicum.explore.server.Category.service;
+package ru.practicum.explore.server.category.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,12 +6,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.explore.server.Category.CategoryDto.CategoryResponseDto;
-import ru.practicum.explore.server.Category.CategoryDto.NewCategoryDto;
-import ru.practicum.explore.server.Category.CategoryDto.UpdateCategoryDto;
-import ru.practicum.explore.server.Category.dal.CategoryMapper;
-import ru.practicum.explore.server.Category.dal.CategoryRepository;
-import ru.practicum.explore.server.Category.model.Category;
+import ru.practicum.explore.server.category.dto.CategoryResponseDto;
+import ru.practicum.explore.server.category.dto.NewCategoryDto;
+import ru.practicum.explore.server.category.dto.UpdateCategoryDto;
+import ru.practicum.explore.server.category.dal.CategoryMapper;
+import ru.practicum.explore.server.category.dal.CategoryRepository;
+import ru.practicum.explore.server.category.model.Category;
 import ru.practicum.explore.server.exception.ConflictException;
 import ru.practicum.explore.server.exception.NotFoundException;
 

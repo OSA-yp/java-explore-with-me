@@ -1,4 +1,4 @@
-package ru.practicum.explore.server.Category;
+package ru.practicum.explore.server.category;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explore.server.Category.CategoryDto.CategoryResponseDto;
-import ru.practicum.explore.server.Category.CategoryDto.NewCategoryDto;
-import ru.practicum.explore.server.Category.CategoryDto.UpdateCategoryDto;
-import ru.practicum.explore.server.Category.service.CategoryService;
+import ru.practicum.explore.server.category.dto.CategoryResponseDto;
+import ru.practicum.explore.server.category.dto.NewCategoryDto;
+import ru.practicum.explore.server.category.dto.UpdateCategoryDto;
+import ru.practicum.explore.server.category.service.CategoryService;
 import ru.practicum.explore.server.utils.HitSender;
 
 import java.util.Collection;

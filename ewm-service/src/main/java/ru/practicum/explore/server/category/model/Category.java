@@ -1,4 +1,4 @@
-package ru.practicum.explore.server.Category.model;
+package ru.practicum.explore.server.category.model;
 
 import jakarta.persistence.*;
 import lombok.*;

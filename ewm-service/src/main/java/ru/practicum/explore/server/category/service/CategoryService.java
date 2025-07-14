@@ -1,8 +1,8 @@
-package ru.practicum.explore.server.Category.service;
+package ru.practicum.explore.server.category.service;
 
-import ru.practicum.explore.server.Category.CategoryDto.CategoryResponseDto;
-import ru.practicum.explore.server.Category.CategoryDto.NewCategoryDto;
-import ru.practicum.explore.server.Category.CategoryDto.UpdateCategoryDto;
+import ru.practicum.explore.server.category.dto.CategoryResponseDto;
+import ru.practicum.explore.server.category.dto.NewCategoryDto;
+import ru.practicum.explore.server.category.dto.UpdateCategoryDto;
 
 import java.util.Collection;
 

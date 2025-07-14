@@ -1,15 +1,16 @@
-package ru.practicum.explore.server.Category.CategoryDto;
+package ru.practicum.explore.server.category.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewCategoryDto {
+@Builder
+public class UpdateCategoryDto {
+
     @NotBlank
     @Size(max = 50)
     private String name;
