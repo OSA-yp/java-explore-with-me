@@ -5,21 +5,33 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleConflictException(final ConflictException e) {
-        return new ErrorResponse("Conflict exception", e.getMessage());
+    @ExceptionHandler(ValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse exceptionHandler(ValidationException e) {
+        return new ErrorResponse("ValidationException", e.getMessage(), e.getStackTrace());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFound(final NotFoundException e) {
-        return new ErrorResponse(
-                "Искомый объект не найден",
-                e.getMessage()
-        );
+    public ErrorResponse notFoundExceptionHandler(NotFoundException e) {
+        return new ErrorResponse("NotFoundException", e.getMessage(), e.getStackTrace());
     }
+
+    @ExceptionHandler({ConflictException.class})
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse conflictExceptionHandler(ConflictException e) {
+        return new ErrorResponse("ConflictException", e.getMessage(), e.getStackTrace());
+    }
+
+    @ExceptionHandler({ForbiddenException.class})
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse forbiddenExceptionHandler(ForbiddenException e) {
+        return new ErrorResponse("ForbiddenException", e.getMessage(), e.getStackTrace());
+    }
+
+
 }

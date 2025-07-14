@@ -1,35 +1,63 @@
 package ru.practicum.explore.server.Category;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.explore.server.Category.CategoryDto.CategoryDto;
+import ru.practicum.explore.server.Category.CategoryDto.CategoryResponseDto;
 import ru.practicum.explore.server.Category.CategoryDto.NewCategoryDto;
 import ru.practicum.explore.server.Category.CategoryDto.UpdateCategoryDto;
 import ru.practicum.explore.server.Category.service.CategoryService;
+import ru.practicum.explore.server.utils.HitSender;
+
+import java.util.Collection;
 
 @RestController
 @RequiredArgsConstructor
 @Validated
 public class CategoryController {
     private final CategoryService categoryService;
+    private final HitSender hitSender;
 
     @PostMapping("/admin/categories")
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryDto create(@RequestBody @Valid NewCategoryDto dto) {
+    public CategoryResponseDto create(@RequestBody @Valid NewCategoryDto dto, HttpServletRequest request) {
+        hitSender.send(request);
         return categoryService.create(dto);
     }
 
+    @GetMapping("/categories")
+    public Collection<CategoryResponseDto> getCategories(@RequestParam(name = "ids", required = false)
+                                                         Collection<Long> ids,
+                                                         @Valid
+                                                         @RequestParam(name = "from", defaultValue = "0", required = false)
+                                                         Integer from,
+                                                         @RequestParam(name = "size", defaultValue = "10", required = false)
+                                                         @Valid
+                                                         Integer size,
+                                                         HttpServletRequest request) {
+        hitSender.send(request);
+        return categoryService.getCategories(ids, from, size);
+    }
+
+    @GetMapping("/categories/{catId}")
+    public CategoryResponseDto getById(@PathVariable long catId, HttpServletRequest request) {
+        hitSender.send(request);
+        return categoryService.getById(catId);
+    }
+
     @PatchMapping("/admin/categories/{catId}")
-    public CategoryDto update(@PathVariable long catId, @RequestBody @Valid UpdateCategoryDto dto) {
+    public CategoryResponseDto update(@PathVariable long catId, @RequestBody @Valid UpdateCategoryDto dto, HttpServletRequest request) {
+        hitSender.send(request);
         return categoryService.update(catId, dto);
     }
 
     @DeleteMapping("/admin/categories/{catId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable long catId) {
+    public void delete(@PathVariable long catId, HttpServletRequest request) {
+        hitSender.send(request);
         categoryService.delete(catId);
     }
 }
