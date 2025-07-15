@@ -1,11 +1,13 @@
 package ru.practicum.explore.server.request.mapper;
 
+import org.springframework.stereotype.Component;
 import ru.practicum.explore.server.request.dto.ParticipationRequestDto;
 import ru.practicum.explore.server.request.model.ParticipationRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class ParticipationRequestMapper {
 
     public static ParticipationRequest toEntity(ParticipationRequestDto dto) {
