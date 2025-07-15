@@ -11,6 +11,7 @@ import ru.practicum.StatsClient;
 import ru.practicum.explore.dto.ViewStatsDto;
 import ru.practicum.explore.dto.ViewsStatsRequest;
 import ru.practicum.explore.server.category.dal.CategoryRepository;
+import ru.practicum.explore.server.config.AppConfig;
 import ru.practicum.explore.server.event.dto.EventFullDto;
 import ru.practicum.explore.server.event.dto.UpdateEventAdminRequest;
 import ru.practicum.explore.server.event.enums.EventState;
@@ -41,7 +42,8 @@ public class AdminEventService {
     private final EventMapper eventMapper;
     private final CategoryRepository categoryRepository;
     private final ParticipationRequestRepository participationRequestRepository;
-    private final StatsClient statsClient;
+    //private final StatsClient statsClient;
+    private final AppConfig config;
 
     public List<EventFullDto> getEvents(List<Long> users, List<EventState> states, List<Long> categories,
                                         LocalDateTime rangeStart, LocalDateTime rangeEnd, int from, int size) {
@@ -75,6 +77,7 @@ public class AdminEventService {
         Map<String, Event> uriToEventMap = events.stream()
                 .filter(e -> e.getPublishedOn() != null)
                 .collect(Collectors.toMap(e -> "/events/" + e.getId(), e -> e));
+        StatsClient statsClient = new StatsClient(config.getStatsServerUrl());
 
         List<ViewStatsDto> stats = statsClient.getStats(
                 uriToEventMap.entrySet().stream()
@@ -171,7 +174,7 @@ public class AdminEventService {
                     .end(LocalDateTime.now())
                     .unique(true)
                     .build();
-
+            StatsClient statsClient = new StatsClient(config.getStatsServerUrl());
             List<ViewStatsDto> stats = statsClient.getStats(List.of(statsRequest));
             dto.setViews(stats.isEmpty() ? 0L : stats.getFirst().getHits());
         } else {

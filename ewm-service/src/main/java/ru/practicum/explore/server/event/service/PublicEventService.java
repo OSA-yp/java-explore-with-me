@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.StatsClient;
 import ru.practicum.explore.dto.ViewStatsDto;
 import ru.practicum.explore.dto.ViewsStatsRequest;
+import ru.practicum.explore.server.config.AppConfig;
 import ru.practicum.explore.server.event.dto.EventFullDto;
 import ru.practicum.explore.server.event.dto.EventShortDto;
 import ru.practicum.explore.server.event.enums.EventSort;
@@ -37,7 +38,8 @@ public class PublicEventService {
     private final EventRepository eventRepository;
     private final ParticipationRequestRepository requestRepository;
     private final EventMapper eventMapper;
-    private final StatsClient statsClient;
+    //private final StatsClient statsClient;
+    private final AppConfig config;
 
     public List<EventShortDto> getPublicEvents(String text, List<Long> categories, Boolean paid,
                                                LocalDateTime rangeStart, LocalDateTime rangeEnd,
@@ -83,6 +85,7 @@ public class PublicEventService {
                 .uris(uriToEventMap.keySet())
                 .unique(true)
                 .build();
+        StatsClient statsClient = new StatsClient(config.getStatsServerUrl());
 
         List<ViewStatsDto> stats = statsClient.getStats(List.of(statsRequest));
 
@@ -103,6 +106,7 @@ public class PublicEventService {
     public EventFullDto getPublicEventById(Long eventId) {
         Event event = eventRepository.findPublishedEventById(eventId)
                 .orElseThrow(() -> new AppException("Событие с id=" + eventId + " не найдено.", HttpStatus.NOT_FOUND));
+        StatsClient statsClient = new StatsClient(config.getStatsServerUrl());
 
         return feelViewsField(eventId, event, eventMapper, requestRepository, statsClient);
     }

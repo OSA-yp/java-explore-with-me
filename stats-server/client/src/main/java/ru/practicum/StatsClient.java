@@ -52,7 +52,7 @@ public class StatsClient {
         for (ViewsStatsRequest req : requests) {
             try {
                 List<ViewStatsDto> stats = restClient.get()
-                        .uri(uriBuilder -> uriBuilder.path("/stats")
+                        .uri(uriBuilder -> uriBuilder.path(STATS_ENDPOINT)
                                 .queryParam("start", DATE_TIME_FORMATTER.format(req.getStart()))
                                 .queryParam("end", DATE_TIME_FORMATTER.format(req.getEnd()))
                                 .queryParam("uris", req.getUris())
@@ -63,8 +63,9 @@ public class StatsClient {
                         });
                 assert stats != null;
                 allStats.addAll(stats);
-            } catch (HttpStatusCodeException e) {
-                log.error("Ошибка получения статистики: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());
+            } catch (RestClientException e) {
+                log.error("Ошибка при запросе статистики", e);
+                throw new StatsServiceException("Ошибка сервиса статистики", e);
             } catch (Exception e) {
                 log.error("Ошибка при запросе статистики: {}", e.getMessage(), e);
             }

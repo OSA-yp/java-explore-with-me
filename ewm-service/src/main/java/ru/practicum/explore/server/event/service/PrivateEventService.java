@@ -12,6 +12,7 @@ import ru.practicum.explore.dto.ViewStatsDto;
 import ru.practicum.explore.dto.ViewsStatsRequest;
 import ru.practicum.explore.server.category.dal.CategoryRepository;
 import ru.practicum.explore.server.category.model.Category;
+import ru.practicum.explore.server.config.AppConfig;
 import ru.practicum.explore.server.event.dto.EventFullDto;
 import ru.practicum.explore.server.event.dto.EventShortDto;
 import ru.practicum.explore.server.event.dto.NewEventDto;
@@ -55,7 +56,8 @@ public class PrivateEventService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final ParticipationRequestRepository participationRequestRepository;
-    private final StatsClient statsClient;
+    //private final StatsClient statsClient;
+    private final AppConfig config;
 
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
         User user = userRepository.findById(userId)
@@ -143,6 +145,7 @@ public class PrivateEventService {
                 .uris(uriToEventMap.keySet())
                 .unique(true)
                 .build();
+        StatsClient statsClient = new StatsClient(config.getStatsServerUrl());
 
         List<ViewStatsDto> stats = statsClient.getStats(List.of(statsRequest));
 
@@ -161,6 +164,7 @@ public class PrivateEventService {
     public EventFullDto getUserEventById(Long userId, Long eventId) {
         Event event = eventRepository.findByIdAndInitiatorId(eventId, userId)
                 .orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено или не принадлежит пользователю id=" + userId));
+        StatsClient statsClient = new StatsClient(config.getStatsServerUrl());
 
         return feelViewsField(eventId, event, eventMapper, participationRequestRepository, statsClient);
     }
