@@ -1,5 +1,6 @@
 package ru.practicum.explore.server.event.mapper;
 
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
 import ru.practicum.explore.server.category.dal.CategoryMapper;
@@ -16,6 +17,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {CategoryMapper.class, UserMapper.class})
 public interface EventMapper {
 
+    @InheritInverseConfiguration(name = "toEventShortDto")
     EventFullDto toEventFullDto(Event event);
 
     List<EventFullDto> toEventFullDtoList(List<Event> events);
