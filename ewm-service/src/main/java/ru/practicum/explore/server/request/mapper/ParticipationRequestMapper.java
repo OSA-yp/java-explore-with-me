@@ -1,27 +1,48 @@
 package ru.practicum.explore.server.request.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 import ru.practicum.explore.server.request.dto.ParticipationRequestDto;
 import ru.practicum.explore.server.request.model.ParticipationRequest;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
-public interface ParticipationRequestMapper {
+public class ParticipationRequestMapper {
 
+    public static ParticipationRequest toEntity(ParticipationRequestDto dto) {
+        if (dto == null) {
+            return null;
+        }
 
-    ParticipationRequestMapper INSTANCE = Mappers.getMapper(ParticipationRequestMapper.class);
+        ParticipationRequest request = new ParticipationRequest();
+        request.setId(dto.getId());
+        request.setEvent(dto.getEvent());
+        request.setRequester(dto.getRequester());
+        request.setStatus(dto.getStatus());
+        request.setCreated(dto.getCreated());
+        return request;
+    }
 
-    @Mapping(target = "id", source = "dto.id")
-    @Mapping(target = "event", source = "dto.event")
-    @Mapping(target = "requester", source = "dto.requester")
-    @Mapping(target = "status", source = "dto.status")
-    @Mapping(target = "created", source = "dto.created")
-    ParticipationRequest toEntity(ParticipationRequestDto dto);
+    public static ParticipationRequestDto toDto(ParticipationRequest request) {
+        if (request == null) {
+            return null;
+        }
 
-    ParticipationRequestDto toDto(ParticipationRequest request);
+        ParticipationRequestDto dto = new ParticipationRequestDto();
+        dto.setId(request.getId());
+        dto.setEvent(request.getEvent());
+        dto.setRequester(request.getRequester());
+        dto.setStatus(request.getStatus());
+        dto.setCreated(request.getCreated());
+        return dto;
+    }
 
-    List<ParticipationRequestDto> toDtoList(List<ParticipationRequest> requests);
+    public static List<ParticipationRequestDto> toDtoList(List<ParticipationRequest> requests) {
+        if (requests == null) {
+            return null;
+        }
+
+        return requests.stream()
+                .map(ParticipationRequestMapper::toDto)
+                .collect(Collectors.toList());
+    }
 }

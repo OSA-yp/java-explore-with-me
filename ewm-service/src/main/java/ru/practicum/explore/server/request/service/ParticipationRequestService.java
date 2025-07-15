@@ -131,7 +131,7 @@ public class ParticipationRequestService {
 //        }
         List<ParticipationRequest> requests = participationRequestRepository.findByRequester(userId);
         return requests.stream()
-                .map(participationRequestMapper::toDto)
+                .map(ParticipationRequestMapper::toDto)
                 .collect(Collectors.toList());
     }
 
