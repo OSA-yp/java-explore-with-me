@@ -31,7 +31,7 @@ public class PrivateEventController {
     public EventFullDto createEvent(@PathVariable Long userId,
                                     @RequestBody @Valid NewEventDto newEventDto) {
         log.info("Получен запрос на создание события: {}", newEventDto);
-        return privateEventService.createEvent(userId, newEventDto);
+        return  privateEventService.createEvent(userId, newEventDto);
     }
 
     @PatchMapping("/{eventId}")

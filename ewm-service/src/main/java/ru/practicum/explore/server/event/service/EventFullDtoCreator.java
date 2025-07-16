@@ -13,8 +13,8 @@ import java.util.List;
 
 public class EventFullDtoCreator {
 
-    static EventFullDto feelViewsField(Long eventId, Event event, EventMapper eventMapper, ParticipationRequestRepository requestRepository, StatsClient statsClient) {
-        EventFullDto dto = eventMapper.toEventFullDto(event);
+    static EventFullDto feelViewsField(Long eventId, Event event, ParticipationRequestRepository requestRepository, StatsClient statsClient) {
+        EventFullDto dto = EventMapper.toEventFullDto(event);
         dto.setConfirmedRequests(requestRepository.countByEventAndStatus(eventId, RequestStatus.CONFIRMED));
 
         ViewsStatsRequest statsRequest = ViewsStatsRequest.builder()

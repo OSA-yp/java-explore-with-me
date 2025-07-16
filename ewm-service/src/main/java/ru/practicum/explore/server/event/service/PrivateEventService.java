@@ -27,7 +27,6 @@ import ru.practicum.explore.server.request.enums.RequestStatus;
 import ru.practicum.explore.server.request.repository.ParticipationRequestRepository;
 import ru.practicum.explore.server.users.dal.UserRepository;
 import ru.practicum.explore.server.users.model.User;
-import ru.practicum.explore.server.users.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -50,12 +49,9 @@ public class PrivateEventService {
     );
 
     private final EventRepository eventRepository;
-    private final UserService userService;
-    private final EventMapper eventMapper;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final ParticipationRequestRepository participationRequestRepository;
-    //private final StatsClient statsClient;
     private final AppConfig config;
 
     public EventFullDto createEvent(Long userId, NewEventDto newEventDto) {
@@ -65,13 +61,15 @@ public class PrivateEventService {
         Category category = categoryRepository.findById(newEventDto.getCategory())
                 .orElseThrow(() -> new NotFoundException("Категория с id=" + newEventDto.getCategory() + " не найдена."));
 
-        Event event = eventMapper.toEntity(newEventDto);
+        Event event = EventMapper.toEvent(newEventDto);
         event.setInitiator(user);
         event.setCategory(category);
         event.setCreatedOn(LocalDateTime.now());
 
         event = eventRepository.save(event);
-        return eventMapper.toEventFullDto(event);
+        log.info("Event with id={} was created", event.getId());
+
+        return EventMapper.toEventFullDto(event);
     }
 
     public EventFullDto updateEvent(Long userId, Long eventId, UpdateEventUserRequest updateRequest) {
@@ -117,7 +115,7 @@ public class PrivateEventService {
                 .orElse(EventState.PENDING));
 
         Event updated = eventRepository.save(event);
-        EventFullDto dto = eventMapper.toEventFullDto(updated);
+        EventFullDto dto = EventMapper.toEventFullDto(updated);
         dto.setConfirmedRequests(participationRequestRepository.countByEventAndStatus(eventId, RequestStatus.CONFIRMED));
         return dto;
     }
@@ -153,7 +151,7 @@ public class PrivateEventService {
 
         return events.stream()
                 .map(event -> {
-                    EventShortDto dto = eventMapper.toEventShortDto(event);
+                    EventShortDto dto = EventMapper.toEventShortDto(event);
                     dto.setConfirmedRequests(confirmedRequestsMap.getOrDefault(event.getId(), 0L));
                     dto.setViews(viewsMap.getOrDefault("/events/" + event.getId(), 0L));
                     return dto;
@@ -165,7 +163,7 @@ public class PrivateEventService {
                 .orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено или не принадлежит пользователю id=" + userId));
         StatsClient statsClient = new StatsClient(config.getStatsServerUrl());
 
-        return feelViewsField(eventId, event, eventMapper, participationRequestRepository, statsClient);
+        return feelViewsField(eventId, event, participationRequestRepository, statsClient);
     }
 
     private Map<Long, Long> getconfirmedRequestsMap(List<Event> events) {

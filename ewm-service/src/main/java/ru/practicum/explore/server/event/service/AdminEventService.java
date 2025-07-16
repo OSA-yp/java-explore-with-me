@@ -20,6 +20,7 @@ import ru.practicum.explore.server.event.mapper.EventMapper;
 import ru.practicum.explore.server.event.model.Event;
 import ru.practicum.explore.server.event.repository.EventRepository;
 import ru.practicum.explore.server.exception.AppException;
+import ru.practicum.explore.server.exception.ValidationException;
 import ru.practicum.explore.server.request.enums.RequestStatus;
 import ru.practicum.explore.server.request.repository.ParticipationRequestRepository;
 
@@ -120,8 +121,7 @@ public class AdminEventService {
 
         if (updateRequest.getEventDate() != null &&
                 updateRequest.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
-            throw new AppException("Дата начала изменяемого события должна быть не ранее чем за час от текущего времени.",
-                    HttpStatus.BAD_REQUEST);
+            throw new ValidationException("Дата начала изменяемого события должна быть не ранее чем за час от текущего времени.");
         }
 
         if (event.getState() == EventState.PUBLISHED && updateRequest.getStateAction() == StateAction.PUBLISH_EVENT) {

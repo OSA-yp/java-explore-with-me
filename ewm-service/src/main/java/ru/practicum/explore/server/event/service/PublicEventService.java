@@ -20,6 +20,7 @@ import ru.practicum.explore.server.event.mapper.EventMapper;
 import ru.practicum.explore.server.event.model.Event;
 import ru.practicum.explore.server.event.repository.EventRepository;
 import ru.practicum.explore.server.exception.AppException;
+import ru.practicum.explore.server.exception.NotFoundException;
 import ru.practicum.explore.server.exception.ValidationException;
 import ru.practicum.explore.server.request.repository.ParticipationRequestRepository;
 
@@ -105,10 +106,10 @@ public class PublicEventService {
 
     public EventFullDto getPublicEventById(Long eventId) {
         Event event = eventRepository.findPublishedEventById(eventId)
-                .orElseThrow(() -> new AppException("Событие с id=" + eventId + " не найдено.", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено."));
         StatsClient statsClient = new StatsClient(config.getStatsServerUrl());
 
-        return feelViewsField(eventId, event, eventMapper, requestRepository, statsClient);
+        return feelViewsField(eventId, event, requestRepository, statsClient);
     }
 
     private Sort getSort(EventSort sort) {
