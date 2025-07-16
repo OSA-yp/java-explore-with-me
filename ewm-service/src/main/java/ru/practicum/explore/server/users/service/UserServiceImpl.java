@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.explore.server.exception.ConflictException;
 import ru.practicum.explore.server.exception.NotFoundException;
-import ru.practicum.explore.server.exception.ValidationException;
 import ru.practicum.explore.server.users.dal.UserMapper;
 import ru.practicum.explore.server.users.dal.UserRepository;
 import ru.practicum.explore.server.users.dto.UserResponseDto;
@@ -35,7 +34,6 @@ public class UserServiceImpl implements UserService {
 
         return UserMapper.toUserResponseDto(newUser);
     }
-
 
 
     @Override
@@ -76,6 +74,7 @@ public class UserServiceImpl implements UserService {
 
         }
     }
+
     private void checkEmailExisting(String email) {
 
         Optional<User> maybeUser = userRepository.getUserByEmail(email);

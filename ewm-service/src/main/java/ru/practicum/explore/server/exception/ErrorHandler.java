@@ -34,7 +34,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler({AppException.class})
-    public ErrorResponse AppExceptionHandler(ForbiddenException e) {
+    public ErrorResponse appExceptionHandler(ForbiddenException e) {
         return new ErrorResponse("AppException", e.getMessage(), e.getStackTrace());
     }
 
