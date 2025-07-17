@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.explore.server.event.enums.EventState;
 import ru.practicum.explore.server.event.model.Event;
 import ru.practicum.explore.server.event.repository.EventRepository;
+import ru.practicum.explore.server.exception.ConflictException;
 import ru.practicum.explore.server.exception.NotFoundException;
 import ru.practicum.explore.server.exception.ValidationException;
 import ru.practicum.explore.server.request.dto.EventRequestStatusUpdateRequest;
@@ -33,28 +34,25 @@ public class ParticipationRequestService {
     private final EventRepository eventRepository;
 
     public ParticipationRequestDto createRequest(Long userId, Long eventId) {
-//        if (!userService.userExists(userId)) {
-//            throw new NotFoundException("Пользователь с id=" + userId + " не найден.");
-//        }
 
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено."));
 
         if (event.getState() != EventState.PUBLISHED) {
-            throw new ValidationException("Нельзя подать заявку на участие в неопубликованном событии.");
+            throw new ConflictException("Нельзя подать заявку на участие в неопубликованном событии.");
         }
 
         if (event.getInitiator().getId().equals(userId)) {
-            throw new ValidationException("Инициатор не может подать заявку на участие в своём событии.");
+            throw new ConflictException("Инициатор не может подать заявку на участие в своём событии.");
         }
 
         if (participationRequestRepository.existsByRequesterAndEvent(userId, eventId)) {
-            throw new ValidationException("Запрос на участие уже существует.");
+            throw new ConflictException("Запрос на участие уже существует.");
         }
 
         long confirmedRequests = participationRequestRepository.countByEventAndStatus(eventId, RequestStatus.CONFIRMED);
         if (event.getParticipantLimit() > 0 && confirmedRequests >= event.getParticipantLimit()) {
-            throw new ValidationException("Достигнуто максимальное количество участников для события c id: " + eventId + ".");
+            throw new ConflictException("Достигнуто максимальное количество участников для события c id: " + eventId + ".");
         }
 
         ParticipationRequest request = ParticipationRequest.builder()
@@ -79,7 +77,7 @@ public class ParticipationRequestService {
                 .orElseThrow(() -> new NotFoundException("Событие с id=" + eventId + " не найдено."));
 
         if (!event.getInitiator().getId().equals(userId)) {
-            throw new ValidationException("Только инициатор может управлять заявками на участие.");
+            throw new ConflictException("Только инициатор может управлять заявками на участие.");
         }
 
         List<ParticipationRequest> requests = participationRequestRepository.findAllById(request.getRequestIds());
@@ -89,13 +87,13 @@ public class ParticipationRequestService {
 
         for (ParticipationRequest participationRequest : requests) {
             if (participationRequest.getStatus() != RequestStatus.PENDING) {
-                throw new ValidationException("Изменять статус можно только у заявок в ожидании.");
+                throw new ConflictException("Изменять статус можно только у заявок в ожидании.");
             }
         }
 
         long confirmedRequests = participationRequestRepository.countByEventAndStatus(eventId, RequestStatus.CONFIRMED);
         if (event.getParticipantLimit() > 0 && confirmedRequests >= event.getParticipantLimit()) {
-            throw new ValidationException("Достигнут лимит заявок на участие.");
+            throw new ConflictException("Достигнут лимит заявок на участие.");
         }
 
         List<ParticipationRequest> confirmed = new ArrayList<>();
@@ -126,9 +124,6 @@ public class ParticipationRequestService {
     }
 
     public List<ParticipationRequestDto> getUserRequests(Long userId) {
-//        if (!userService.userExists(userId)) {
-//            throw new NotFoundException("Пользователь с id=" + userId + " не найден.");
-//        }
         List<ParticipationRequest> requests = participationRequestRepository.findByRequester(userId);
         return requests.stream()
                 .map(ParticipationRequestMapper::toDto)
@@ -136,10 +131,6 @@ public class ParticipationRequestService {
     }
 
     public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
-//        if (!userService.userExists(userId)) {
-//            throw new NotFoundException("Пользователь с id=" + userId + " не найден.");
-//        }
-
         ParticipationRequest participationRequest = participationRequestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException("Запрос на участие с id=" + requestId + " не найден."));
 

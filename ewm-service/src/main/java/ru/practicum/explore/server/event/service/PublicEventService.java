@@ -25,7 +25,8 @@ import ru.practicum.explore.server.exception.ValidationException;
 import ru.practicum.explore.server.request.repository.ParticipationRequestRepository;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static ru.practicum.explore.server.event.service.EventFullDtoCreator.feelViewsField;
@@ -39,7 +40,6 @@ public class PublicEventService {
     private final EventRepository eventRepository;
     private final ParticipationRequestRepository requestRepository;
     private final EventMapper eventMapper;
-    //private final StatsClient statsClient;
     private final AppConfig config;
 
     public List<EventShortDto> getPublicEvents(String text, List<Long> categories, Boolean paid,

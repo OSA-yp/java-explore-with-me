@@ -20,12 +20,16 @@ import ru.practicum.explore.server.event.mapper.EventMapper;
 import ru.practicum.explore.server.event.model.Event;
 import ru.practicum.explore.server.event.repository.EventRepository;
 import ru.practicum.explore.server.exception.AppException;
+import ru.practicum.explore.server.exception.ConflictException;
+import ru.practicum.explore.server.exception.NotFoundException;
 import ru.practicum.explore.server.exception.ValidationException;
 import ru.practicum.explore.server.request.enums.RequestStatus;
 import ru.practicum.explore.server.request.repository.ParticipationRequestRepository;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -43,7 +47,6 @@ public class AdminEventService {
     private final EventMapper eventMapper;
     private final CategoryRepository categoryRepository;
     private final ParticipationRequestRepository participationRequestRepository;
-    //private final StatsClient statsClient;
     private final AppConfig config;
 
     public List<EventFullDto> getEvents(List<Long> users, List<EventState> states, List<Long> categories,
@@ -125,15 +128,15 @@ public class AdminEventService {
         }
 
         if (event.getState() == EventState.PUBLISHED && updateRequest.getStateAction() == StateAction.PUBLISH_EVENT) {
-            throw new AppException("Нельзя публиковать уже опубликованное событие.", HttpStatus.CONFLICT);
+            throw new ConflictException("Нельзя публиковать уже опубликованное событие.");
         }
 
         if (event.getState() == EventState.CANCELED && updateRequest.getStateAction() == StateAction.PUBLISH_EVENT) {
-            throw new AppException("Нельзя опубликовать отклонённое событие.", HttpStatus.CONFLICT);
+            throw new ConflictException("Нельзя опубликовать отклонённое событие.");
         }
 
         if (event.getState() == EventState.PUBLISHED && updateRequest.getStateAction() == StateAction.REJECT_EVENT) {
-            throw new AppException("Нельзя отклонить уже опубликованное событие.", HttpStatus.CONFLICT);
+            throw new ConflictException("Нельзя отклонить уже опубликованное событие.");
         }
 
         updateField(updateRequest.getTitle(), event::setTitle);
@@ -143,7 +146,7 @@ public class AdminEventService {
         if (updateRequest.getCategory() != null) {
             var category = categoryRepository.getCategoryById(updateRequest.getCategory());
             if (category == null) {
-                throw new AppException("Категория с id=" + updateRequest.getCategory() + " не найдена.", HttpStatus.NOT_FOUND);
+                throw new NotFoundException("Категория с id=" + updateRequest.getCategory() + " не найдена.");
             }
             event.setCategory(category);
         }

@@ -21,6 +21,7 @@ import ru.practicum.explore.server.event.enums.UserStateAction;
 import ru.practicum.explore.server.event.mapper.EventMapper;
 import ru.practicum.explore.server.event.model.Event;
 import ru.practicum.explore.server.event.repository.EventRepository;
+import ru.practicum.explore.server.exception.ConflictException;
 import ru.practicum.explore.server.exception.NotFoundException;
 import ru.practicum.explore.server.exception.ValidationException;
 import ru.practicum.explore.server.request.enums.RequestStatus;
@@ -81,7 +82,7 @@ public class PrivateEventService {
         }
 
         if (event.getState() == EventState.PUBLISHED) {
-            throw new ValidationException("Опубликованное событие нельзя редактировать.");
+            throw new ConflictException("Опубликованное событие нельзя редактировать.");
         }
 
         if (event.getState() != EventState.PENDING && event.getState() != EventState.CANCELED) {
