@@ -1,6 +1,5 @@
-package ru.practicum.explore.server.users;
+package ru.practicum.explore.server.users.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -9,7 +8,6 @@ import ru.practicum.explore.server.users.dal.UserMapper;
 import ru.practicum.explore.server.users.dto.NewUserRequestDto;
 import ru.practicum.explore.server.users.dto.UserResponseDto;
 import ru.practicum.explore.server.users.service.UserService;
-import ru.practicum.explore.server.utils.HitSender;
 
 import java.util.Collection;
 
@@ -18,7 +16,6 @@ import java.util.Collection;
 public class UsersController {
 
     private final UserService userService;
-    private final HitSender hitSender;
 
 
     @PostMapping("/admin/users")
@@ -26,10 +23,8 @@ public class UsersController {
     public UserResponseDto addUser(
             @Valid
             @RequestBody
-            NewUserRequestDto newUser,
-            HttpServletRequest request) {
+            NewUserRequestDto newUser) {
 
-        hitSender.send(request);
         return userService.addUser(UserMapper.toUser(newUser));
     }
 
@@ -45,21 +40,22 @@ public class UsersController {
 
             @RequestParam(name = "size", defaultValue = "10", required = false)
             @Valid
-            Integer size,
+            Integer size) {
 
-            HttpServletRequest request) {
 
-        hitSender.send(request);
-        return userService.getUsers(ids, from, size);
+        GetUsersParams getUsersParams = new GetUsersParams();
+        getUsersParams.setIds(ids);
+        getUsersParams.setFrom(from);
+        getUsersParams.setSize(size);
+
+        return userService.getUsers(getUsersParams);
 
     }
 
     @DeleteMapping("/admin/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteUserById(@PathVariable Long userId,
-                               HttpServletRequest request) {
+    public void deleteUserById(@PathVariable Long userId) {
 
-        hitSender.send(request);
         userService.deleteUserById(userId);
 
     }

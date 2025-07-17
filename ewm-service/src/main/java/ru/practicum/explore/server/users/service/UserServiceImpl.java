@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.explore.server.exception.ConflictException;
 import ru.practicum.explore.server.exception.NotFoundException;
+import ru.practicum.explore.server.users.controller.GetUsersParams;
 import ru.practicum.explore.server.users.dal.UserMapper;
 import ru.practicum.explore.server.users.dal.UserRepository;
 import ru.practicum.explore.server.users.dto.UserResponseDto;
@@ -37,12 +38,12 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public Collection<UserResponseDto> getUsers(Collection<Long> ids, Integer from, Integer size) {
+    public Collection<UserResponseDto> getUsers(GetUsersParams params) {
 
-        Pageable pageable = PageRequest.of(from, size);
+        Pageable pageable = PageRequest.of(params.getFrom(), params.getSize());
 
-        if (ids != null && !ids.isEmpty()) {
-            Collection<User> users = userRepository.findAllById(ids);
+        if (params.getIds() != null && !params.getIds().isEmpty()) {
+            Collection<User> users = userRepository.findAllById(params.getIds());
             return users.stream()
                     .map(UserMapper::toUserResponseDto)
                     .toList();

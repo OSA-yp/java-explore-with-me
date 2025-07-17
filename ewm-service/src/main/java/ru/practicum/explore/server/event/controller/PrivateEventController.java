@@ -1,4 +1,4 @@
-package ru.practicum.explore.server.event.controllers;
+package ru.practicum.explore.server.event.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

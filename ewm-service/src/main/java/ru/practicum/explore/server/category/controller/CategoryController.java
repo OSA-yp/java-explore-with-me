@@ -1,6 +1,5 @@
-package ru.practicum.explore.server.category;
+package ru.practicum.explore.server.category.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,8 +22,7 @@ public class CategoryController {
 
     @PostMapping("/admin/categories")
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryResponseDto create(@RequestBody @Valid NewCategoryDto dto, HttpServletRequest request) {
-        hitSender.send(request);
+    public CategoryResponseDto create(@RequestBody @Valid NewCategoryDto dto) {
         return categoryService.create(dto);
     }
 
@@ -36,28 +34,23 @@ public class CategoryController {
                                                          Integer from,
                                                          @RequestParam(name = "size", defaultValue = "10", required = false)
                                                          @Valid
-                                                         Integer size,
-                                                         HttpServletRequest request) {
-        hitSender.send(request);
+                                                         Integer size) {
         return categoryService.getCategories(ids, from, size);
     }
 
     @GetMapping("/categories/{catId}")
-    public CategoryResponseDto getById(@PathVariable long catId, HttpServletRequest request) {
-        hitSender.send(request);
+    public CategoryResponseDto getById(@PathVariable long catId) {
         return categoryService.getById(catId);
     }
 
     @PatchMapping("/admin/categories/{catId}")
-    public CategoryResponseDto update(@PathVariable long catId, @RequestBody @Valid UpdateCategoryDto dto, HttpServletRequest request) {
-        hitSender.send(request);
+    public CategoryResponseDto update(@PathVariable long catId, @RequestBody @Valid UpdateCategoryDto dto) {
         return categoryService.update(catId, dto);
     }
 
     @DeleteMapping("/admin/categories/{catId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable long catId, HttpServletRequest request) {
-        hitSender.send(request);
+    public void delete(@PathVariable long catId) {
         categoryService.delete(catId);
     }
 }
