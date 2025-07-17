@@ -33,5 +33,11 @@ public class ErrorHandler {
         return new ErrorResponse("ForbiddenException", e.getMessage(), e.getStackTrace());
     }
 
+    @ExceptionHandler({AppException.class})
+    public ErrorResponse appExceptionHandler(ForbiddenException e) {
+        return new ErrorResponse("AppException", e.getMessage(), e.getStackTrace());
+    }
+
+
 
 }
