@@ -124,10 +124,6 @@ public class PrivateEventService {
     public List<EventShortDto> getUserEvents(Long userId, int from, int size) {
         Pageable pageable = PageRequest.of(from / size, size, Sort.by(Sort.Direction.DESC, "createdOn"));
 
-//        if (!userService.userExists(userId)) {
-//            throw new NotFoundException("Пользователь с id=" + userId + " не найден.");
-//        }
-
         List<Event> events = eventRepository.findByInitiatorId(userId, pageable);
         if (events.isEmpty()) return List.of();
 
