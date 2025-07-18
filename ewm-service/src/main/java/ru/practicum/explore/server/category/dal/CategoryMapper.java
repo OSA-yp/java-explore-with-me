@@ -1,9 +1,9 @@
 package ru.practicum.explore.server.category.dal;
 
 import ru.practicum.explore.server.category.dto.CategoryResponseDto;
+import ru.practicum.explore.server.category.dto.NewCategoryDto;
 import ru.practicum.explore.server.category.dto.UpdateCategoryDto;
 import ru.practicum.explore.server.category.model.Category;
-import ru.practicum.explore.server.category.dto.NewCategoryDto;
 
 public class CategoryMapper {
 

@@ -27,7 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponseDto create(NewCategoryDto dto) {
-        if (categoryRepository.existsByName(dto.getName())) {
+        if (categoryRepository.existsByNameIgnoreCase(dto.getName())) {
             throw new ConflictException("Категория с таким именем уже есть");
         }
         Category newCategory = categoryRepository.save(CategoryMapper.toCategory(dto));
@@ -54,8 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponseDto getById(Long id) {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Категория с id = " + id + " не найдена"));
+        Category category = findCategoryById(id);
         return CategoryMapper.toDto(category);
     }
 
@@ -83,5 +82,10 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.deleteById(id);
         log.info("Category with id={} was deleted", id);
 
+    }
+
+    private Category findCategoryById(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Категория с id = " + id + " не найдена"));
     }
 }
