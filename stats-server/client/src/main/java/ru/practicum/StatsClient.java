@@ -9,10 +9,12 @@ import org.springframework.web.client.RestClientException;
 import ru.practicum.exception.StatsServiceException;
 import ru.practicum.explore.dto.EndpointHitDto;
 import ru.practicum.explore.dto.ViewStatsDto;
+import ru.practicum.explore.dto.ViewsStatsRequest;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -44,35 +46,30 @@ public class StatsClient {
         }
     }
 
-    public List<ViewStatsDto> getStats(String start, String end, List<String> uris, Boolean unique) {
-        validateDateTimeParameters(start, end);
-
-        try {
-            log.debug("Запрос статистики: start={}, end={}, uris={}, unique={}", start, end, uris, unique);
-
-            List<ViewStatsDto> stats = restClient.get()
-                    .uri(uriBuilder -> {
-                        uriBuilder.path(STATS_ENDPOINT)
-                                .queryParam("start", start)
-                                .queryParam("end", end)
-                                .queryParam("unique", Boolean.TRUE.equals(unique));
-
-                        if (uris != null && !uris.isEmpty()) {
-                            uriBuilder.queryParam("uris", uris.toArray());
-                        }
-
-                        return uriBuilder.build();
-                    })
-                    .retrieve()
-                    .body(new ParameterizedTypeReference<>() {
-                    });
-
-            log.debug("Получено {} записей статистики", stats != null ? stats.size() : 0);
-            return stats;
-        } catch (RestClientException e) {
-            log.error("Ошибка при запросе статистики", e);
-            throw new StatsServiceException("Ошибка сервиса статистики", e);
+    public List<ViewStatsDto> getStats(List<ViewsStatsRequest> requests) {
+        List<ViewStatsDto> allStats = new ArrayList<>();
+        for (ViewsStatsRequest req : requests) {
+            try {
+                List<ViewStatsDto> stats = restClient.get()
+                        .uri(uriBuilder -> uriBuilder.path(STATS_ENDPOINT)
+                                .queryParam("start", DATE_TIME_FORMATTER.format(req.getStart()))
+                                .queryParam("end", DATE_TIME_FORMATTER.format(req.getEnd()))
+                                .queryParam("uris", req.getUris())
+                                .queryParam("unique", req.isUnique())
+                                .build())
+                        .retrieve()
+                        .body(new ParameterizedTypeReference<>() {
+                        });
+                assert stats != null;
+                allStats.addAll(stats);
+            } catch (RestClientException e) {
+                log.error("Ошибка при запросе статистики", e);
+                throw new StatsServiceException("Ошибка сервиса статистики", e);
+            } catch (Exception e) {
+                log.error("Ошибка при запросе статистики: {}", e.getMessage(), e);
+            }
         }
+        return allStats;
     }
 
     private void validateDateTimeParameters(String start, String end) {
