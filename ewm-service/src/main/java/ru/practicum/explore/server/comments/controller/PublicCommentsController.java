@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explore.server.comments.controller.params.GetPublicCommentsParams;
 import ru.practicum.explore.server.comments.dto.PublicCommentResponseDto;
 import ru.practicum.explore.server.comments.service.CommentsService;
 import ru.practicum.explore.server.exception.ValidationException;

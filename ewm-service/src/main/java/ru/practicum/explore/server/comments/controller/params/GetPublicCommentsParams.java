@@ -1,4 +1,4 @@
-package ru.practicum.explore.server.comments.controller;
+package ru.practicum.explore.server.comments.controller.params;
 
 import lombok.Getter;
 import lombok.Setter;

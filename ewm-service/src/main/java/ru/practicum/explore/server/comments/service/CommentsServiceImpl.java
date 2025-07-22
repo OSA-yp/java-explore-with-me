@@ -1,32 +1,41 @@
 package ru.practicum.explore.server.comments.service;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.explore.server.comments.controller.GetPublicCommentsParams;
+import ru.practicum.explore.server.comments.controller.params.AddCommentParams;
+import ru.practicum.explore.server.comments.controller.params.GetPublicCommentsParams;
 import ru.practicum.explore.server.comments.dal.CommentMapper;
 import ru.practicum.explore.server.comments.dal.CommentsRepository;
+import ru.practicum.explore.server.comments.dto.FullCommentResponseDto;
 import ru.practicum.explore.server.comments.dto.PublicCommentResponseDto;
 import ru.practicum.explore.server.comments.model.Comment;
 import ru.practicum.explore.server.comments.model.CommentStatus;
+import ru.practicum.explore.server.config.AppConfig;
 import ru.practicum.explore.server.event.service.PublicEventService;
-import ru.practicum.explore.server.exception.NotFoundException;
+import ru.practicum.explore.server.users.controller.GetUsersParams;
+import ru.practicum.explore.server.users.service.UserService;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.List;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class CommentsServiceImpl implements CommentsService {
 
     private final CommentsRepository commentsRepository;
     private final PublicEventService publicEventService;
+    private final UserService userService;
 
-    public Collection<PublicCommentResponseDto> getPublicEventComments (GetPublicCommentsParams params){
 
-        // проверка на существование события на стороне сервиса событий
-        publicEventService.getPublicEventById(params.eventId);
+    public Collection<PublicCommentResponseDto> getPublicEventComments(GetPublicCommentsParams params) {
+
+        checkEvent(params.eventId);
 
 //        Pageable pageable = PageRequest.of(params.getFrom(), params.getSize());
         Pageable pageable = PageRequest.of(params.getFrom() / params.getSize(), params.getSize());
@@ -36,8 +45,39 @@ public class CommentsServiceImpl implements CommentsService {
                 CommentStatus.PUBLISHED,
                 pageable);
 
-        return  comments.stream()
+        return comments.stream()
                 .map(CommentMapper::toPublicCommentResponseDto)
                 .toList();
+    }
+
+    @Override
+    public FullCommentResponseDto addComment(AddCommentParams params) {
+
+        checkEvent(params.getEventId());
+        checkUser(params.getUserId());
+
+        Comment comment = CommentMapper.toComment(params);
+
+        Comment newComment = commentsRepository.save(comment);
+
+        log.info("Comment with id={} was created", newComment.getId());
+
+        return CommentMapper.toFullCommentResponseDto(newComment);
+    }
+
+    private void checkUser(Long userId) {
+
+        GetUsersParams params = new GetUsersParams();
+
+        params.setIds(List.of(userId));
+        params.setSize(1);
+        params.setFrom(0);
+        // проверка на существование пользователя на стороне сервиса пользователей
+        userService.getUsers(params);
+    }
+
+    private void checkEvent(Long eventId) {
+        // проверка на существование события на стороне сервиса событий
+        publicEventService.getPublicEventById(eventId);
     }
 }
