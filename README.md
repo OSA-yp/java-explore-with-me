@@ -80,14 +80,14 @@ QUERY PARAMETERS
     "id": 123,
     "commentator": 12,
     "event": 45,
-    "comment": "This is second comment",
+    "text": "This is second comment",
     "published": "2025-07-21 17:12:45"
   },
   {
     "id": 12,
     "commentator": 11,
     "event": 45,
-    "comment": "This is first comment",
+    "text": "This is first comment",
     "published": "2025-07-20 11:12:41"
   }
 ]
@@ -130,7 +130,7 @@ REQUEST BODY SCHEMA: application/json
 
 ```json
 {
-  "comment": "This is test comment"
+  "text": "This is test comment"
 }
 ```
 
@@ -141,7 +141,7 @@ REQUEST BODY SCHEMA: application/json
   "id": 123,
   "commentator": 12,
   "event": 45,
-  "comment": "This is test comment",
+  "text": "This is test comment",
   "created": "2025-07-21 15:32:00",
   "status": "NEW"
 }
@@ -183,7 +183,7 @@ REQUEST BODY SCHEMA: application/json
 
 ```json
 {
-  "comment": "This is new text for test comment"
+  "text": "This is new text for test comment"
 }
 ```
 
@@ -194,7 +194,7 @@ REQUEST BODY SCHEMA: application/json
   "id": 123,
   "commentator": 12,
   "event": 45,
-  "comment": "This is new text for test comment",
+  "text": "This is new text for test comment",
   "created": "2025-07-21 15:32:00",
   "status": "NEW"
 }
@@ -257,7 +257,7 @@ QUERY PARAMETERS
     "id": 123,
     "commentator": 12,
     "event": 45,
-    "comment": "This is second comment",
+    "text": "This is second comment",
     "created": "2025-07-20 21:11:05",
     "published": "2025-07-21 17:42:45",
     "status": "PUBLISHED"
@@ -266,7 +266,7 @@ QUERY PARAMETERS
     "id": 12,
     "commentator": 12,
     "event": 4,
-    "comment": "This is first comment",
+    "text": "This is first comment",
     "created": "2025-07-20 21:11:05",
     "published": null,
     "status": "NEW"
@@ -307,6 +307,7 @@ QUERY PARAMETERS
     "id": 123,
     "commentator": 12,
     "event": 45,
+    "text" : "Comment text",
     "created": "2025-07-27 21:11:05",
     "published": null,
     "status": "NEW"
@@ -315,6 +316,7 @@ QUERY PARAMETERS
     "id": 12,
     "commentator": 11,
     "event": 45,
+    "text" : "Comment text",
     "created": "2025-07-21 11:01:35",
     "published": null,
     "status": "NEW"
@@ -323,6 +325,7 @@ QUERY PARAMETERS
     "id": 112,
     "commentator": 111,
     "event": 4,
+    "text" : "Comment text",
     "created": "2025-07-19 11:01:35",
     "published": "2025-07-21 17:42:45",
     "status": "PUBLISHED"
@@ -331,6 +334,7 @@ QUERY PARAMETERS
     "id": 13,
     "commentator": 1,
     "event": 5,
+    "text" : "Comment text",
     "created": "2025-01-21 11:01:35",
     "published": null,
     "status": "REJECTED"
