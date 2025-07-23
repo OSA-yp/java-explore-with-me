@@ -73,8 +73,11 @@ public class CommentsServiceImpl implements CommentsService {
 
 
     private EventFullDto checkEvent(Long eventId) {
+
         // проверка на существование события на стороне сервиса событий
+        // так как получаются только опубликованные события, то для всех остальных будет 404
         return publicEventService.getPublicEventById(eventId);
+
     }
 
     private void checkEvent(Long eventId, Long userId) {
