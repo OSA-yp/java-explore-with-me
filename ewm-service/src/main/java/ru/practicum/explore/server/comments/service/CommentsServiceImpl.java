@@ -14,14 +14,13 @@ import ru.practicum.explore.server.comments.dto.FullCommentResponseDto;
 import ru.practicum.explore.server.comments.dto.PublicCommentResponseDto;
 import ru.practicum.explore.server.comments.model.Comment;
 import ru.practicum.explore.server.comments.model.CommentStatus;
-import ru.practicum.explore.server.config.AppConfig;
+import ru.practicum.explore.server.event.dto.EventFullDto;
 import ru.practicum.explore.server.event.service.PublicEventService;
-import ru.practicum.explore.server.users.controller.GetUsersParams;
+import ru.practicum.explore.server.exception.ForbiddenException;
 import ru.practicum.explore.server.users.service.UserService;
 
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -53,8 +52,9 @@ public class CommentsServiceImpl implements CommentsService {
     @Override
     public FullCommentResponseDto addComment(AddCommentParams params) {
 
-        checkEvent(params.getEventId());
         checkUser(params.getUserId());
+        checkEvent(params.getEventId(), params.getUserId());
+
 
         Comment comment = CommentMapper.toComment(params);
 
@@ -67,17 +67,23 @@ public class CommentsServiceImpl implements CommentsService {
 
     private void checkUser(Long userId) {
 
-        GetUsersParams params = new GetUsersParams();
-
-        params.setIds(List.of(userId));
-        params.setSize(1);
-        params.setFrom(0);
         // проверка на существование пользователя на стороне сервиса пользователей
-        userService.getUsers(params);
+        userService.checkUser(userId);
     }
 
-    private void checkEvent(Long eventId) {
+
+    private EventFullDto checkEvent(Long eventId) {
         // проверка на существование события на стороне сервиса событий
-        publicEventService.getPublicEventById(eventId);
+        return publicEventService.getPublicEventById(eventId);
+    }
+
+    private void checkEvent(Long eventId, Long userId) {
+
+        EventFullDto event = checkEvent(eventId);
+
+        if (Objects.equals(userId, event.getInitiator().getId())) {
+            throw new ForbiddenException("Комментировать можно только чужие события");
+        }
+
     }
 }

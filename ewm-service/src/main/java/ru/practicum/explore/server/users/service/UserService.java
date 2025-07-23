@@ -12,4 +12,6 @@ public interface UserService {
     Collection<UserResponseDto> getUsers(GetUsersParams params);
 
     void deleteUserById(Long userId);
+
+    void checkUser(Long userId);
 }
