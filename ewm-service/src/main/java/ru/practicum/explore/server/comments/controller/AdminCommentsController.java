@@ -4,10 +4,8 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.explore.server.comments.controller.params.CommentStatusAction;
 import ru.practicum.explore.server.comments.controller.params.GetAdminCommentsFilter;
 import ru.practicum.explore.server.comments.controller.params.GetAdminCommentsParams;
 import ru.practicum.explore.server.comments.dto.FullCommentResponseDto;
@@ -57,5 +55,31 @@ public class AdminCommentsController {
         params.setSize(size);
 
         return commentsService.getAdminComments(params);
+    }
+
+    @PatchMapping("/admin/comments/{commentId}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void setApprovedOrRejectComment(
+
+            @PathVariable
+            Long commentId,
+
+            @RequestParam(name = "status")
+            CommentStatusAction newStatus
+    ) {
+         commentsService.approveOrRejectComment(commentId, newStatus);
+
+    }
+
+
+    @DeleteMapping("/admin/comments/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteComment(
+
+            @PathVariable
+            Long commentId) {
+
+        commentsService.adminDeleteComment(commentId);
+
     }
 }

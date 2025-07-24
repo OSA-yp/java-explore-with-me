@@ -4,11 +4,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.explore.server.comments.controller.params.AddCommentParams;
 import ru.practicum.explore.server.comments.dto.FullCommentResponseDto;
-import ru.practicum.explore.server.comments.dto.NewCommentDto;
 import ru.practicum.explore.server.comments.dto.PublicCommentResponseDto;
 import ru.practicum.explore.server.comments.model.Comment;
 import ru.practicum.explore.server.comments.model.CommentStatus;
-import ru.practicum.explore.server.config.AppConfig;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,9 +14,6 @@ import java.time.format.DateTimeFormatter;
 @Component
 @AllArgsConstructor
 public class CommentMapper {
-
-    // TODO разобраться с хранением даты-времени
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static FullCommentResponseDto toFullCommentResponseDto(Comment comment) {
 
@@ -54,7 +49,7 @@ public class CommentMapper {
         return dto;
     }
 
-    public static Comment toComment(AddCommentParams params){
+    public static Comment toComment(AddCommentParams params) {
 
         Comment comment = new Comment();
 

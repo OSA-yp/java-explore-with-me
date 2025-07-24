@@ -2,6 +2,7 @@ package ru.practicum.explore.server.comments.service;
 
 import jakarta.validation.Valid;
 import ru.practicum.explore.server.comments.controller.params.AddCommentParams;
+import ru.practicum.explore.server.comments.controller.params.CommentStatusAction;
 import ru.practicum.explore.server.comments.controller.params.GetAdminCommentsParams;
 import ru.practicum.explore.server.comments.controller.params.GetPublicCommentsParams;
 import ru.practicum.explore.server.comments.dto.FullCommentResponseDto;
@@ -16,4 +17,8 @@ public interface CommentsService {
     FullCommentResponseDto addComment(AddCommentParams params);
 
     Collection<FullCommentResponseDto> getAdminComments(GetAdminCommentsParams params);
+
+    void approveOrRejectComment(Long commentId, CommentStatusAction newStatus);
+
+    void adminDeleteComment(Long commentId);
 }
