@@ -7,9 +7,17 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.explore.server.comments.model.Comment;
 import ru.practicum.explore.server.comments.model.CommentStatus;
 
+import java.util.Optional;
+
 @Repository
 public interface CommentsRepository extends JpaRepository<Comment, Long> {
 
 
     Page<Comment> findByEventAndStatusOrderByPublishedDesc(Long eventId, CommentStatus status, Pageable pageable);
+
+    Page<Comment> findAllByStatusOrderByCreatedAsc(CommentStatus status, Pageable pageable);
+
+    Page<Comment> findAllByOrderByCreatedAsc(Pageable pageable);
+
+    Optional<Comment> getCommentById(Long id);
 }
