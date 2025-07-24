@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.explore.server.comments.controller.params.AddCommentParams;
+import ru.practicum.explore.server.comments.controller.params.GetAdminCommentsParams;
 import ru.practicum.explore.server.comments.controller.params.GetPublicCommentsParams;
 import ru.practicum.explore.server.comments.dal.CommentMapper;
 import ru.practicum.explore.server.comments.dal.CommentsRepository;
@@ -20,6 +21,7 @@ import ru.practicum.explore.server.exception.ForbiddenException;
 import ru.practicum.explore.server.users.service.UserService;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 @Slf4j
@@ -36,7 +38,6 @@ public class CommentsServiceImpl implements CommentsService {
 
         checkEvent(params.eventId);
 
-//        Pageable pageable = PageRequest.of(params.getFrom(), params.getSize());
         Pageable pageable = PageRequest.of(params.getFrom() / params.getSize(), params.getSize());
 
         Page<Comment> comments = commentsRepository.findByEventAndStatusOrderByPublishedDesc(
@@ -63,6 +64,32 @@ public class CommentsServiceImpl implements CommentsService {
         log.info("Comment with id={} was created", newComment.getId());
 
         return CommentMapper.toFullCommentResponseDto(newComment);
+    }
+
+    @Override
+    public Collection<FullCommentResponseDto> getAdminComments(GetAdminCommentsParams params) {
+
+        Pageable pageable = PageRequest.of(params.getFrom() / params.getSize(), params.getSize());
+
+        CommentStatus status = null; // для фильтра all
+
+        switch (params.getFilter()){
+            case NEW -> status = CommentStatus.NEW;
+            case PUBLISHED -> status = CommentStatus.PUBLISHED;
+            case REJECTED -> status = CommentStatus.REJECTED;
+        }
+
+        Page<Comment> comments;
+
+        if (status != null) {
+            comments = commentsRepository.findAllByStatusOrderByCreatedAsc(status, pageable);
+        } else {
+           comments = commentsRepository.findAllByOrderByCreatedAsc(pageable);
+        }
+
+        return comments.stream()
+                .map(CommentMapper::toFullCommentResponseDto)
+                .toList();
     }
 
     private void checkUser(Long userId) {

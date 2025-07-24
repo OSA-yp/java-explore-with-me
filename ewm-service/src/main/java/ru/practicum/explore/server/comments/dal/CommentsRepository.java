@@ -12,4 +12,8 @@ public interface CommentsRepository extends JpaRepository<Comment, Long> {
 
 
     Page<Comment> findByEventAndStatusOrderByPublishedDesc(Long eventId, CommentStatus status, Pageable pageable);
+
+    Page<Comment> findAllByStatusOrderByCreatedAsc(CommentStatus status, Pageable pageable);
+
+    Page<Comment> findAllByOrderByCreatedAsc(Pageable pageable);
 }
