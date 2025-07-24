@@ -4,11 +4,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.explore.server.comments.controller.params.AddCommentParams;
 import ru.practicum.explore.server.comments.dto.FullCommentResponseDto;
-import ru.practicum.explore.server.comments.dto.NewCommentDto;
 import ru.practicum.explore.server.comments.dto.PublicCommentResponseDto;
+import ru.practicum.explore.server.comments.dto.UpdateCommentDto;
 import ru.practicum.explore.server.comments.model.Comment;
 import ru.practicum.explore.server.comments.model.CommentStatus;
-import ru.practicum.explore.server.config.AppConfig;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -54,7 +53,7 @@ public class CommentMapper {
         return dto;
     }
 
-    public static Comment toComment(AddCommentParams params){
+    public static Comment toComment(AddCommentParams params) {
 
         Comment comment = new Comment();
 
@@ -65,6 +64,10 @@ public class CommentMapper {
         comment.setStatus(CommentStatus.NEW);
 
         return comment;
+
+    }
+
+    public static void updateDto(Comment comment, UpdateCommentDto updateCommentDto) {
 
     }
 }
