@@ -1,6 +1,5 @@
 package ru.practicum.explore.server.comments.service;
 
-import jakarta.validation.Valid;
 import ru.practicum.explore.server.comments.controller.params.AddCommentParams;
 import ru.practicum.explore.server.comments.controller.params.CommentStatusAction;
 import ru.practicum.explore.server.comments.controller.params.GetAdminCommentsParams;
