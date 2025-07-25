@@ -38,7 +38,6 @@ public class CommentsServiceImpl implements CommentsService {
 
         checkEvent(params.eventId);
 
-//        Pageable pageable = PageRequest.of(params.getFrom(), params.getSize());
         Pageable pageable = PageRequest.of(params.getFrom() / params.getSize(), params.getSize());
 
         Page<Comment> comments = commentsRepository.findByEventAndStatusOrderByPublishedDesc(
@@ -90,6 +89,51 @@ public class CommentsServiceImpl implements CommentsService {
         }
         commentsRepository.delete(comment);
 
+    public Collection<FullCommentResponseDto> getAdminComments(GetAdminCommentsParams params) {
+
+        Pageable pageable = PageRequest.of(params.getFrom() / params.getSize(), params.getSize());
+
+        CommentStatus status = null; // для фильтра all
+
+        switch (params.getFilter()) {
+            case NEW -> status = CommentStatus.NEW;
+            case PUBLISHED -> status = CommentStatus.PUBLISHED;
+            case REJECTED -> status = CommentStatus.REJECTED;
+        }
+
+        Page<Comment> comments;
+
+        if (status != null) {
+            comments = commentsRepository.findAllByStatusOrderByCreatedAsc(status, pageable);
+        } else {
+            comments = commentsRepository.findAllByOrderByCreatedAsc(pageable);
+        }
+
+        return comments.stream()
+                .map(CommentMapper::toFullCommentResponseDto)
+                .toList();
+    }
+
+    @Override
+    public void approveOrRejectComment(Long commentId, CommentStatusAction newStatus) {
+
+        Comment comment = checkAndGetComment(commentId);
+
+        if (comment.getStatus() != CommentStatus.NEW) {
+            throw new ForbiddenException("Can't change status for comment with id="
+                    + commentId + " because it's current status in not NEW");
+        }
+
+        switch (newStatus) {
+            case APPROVED -> comment.setStatus(CommentStatus.PUBLISHED);
+            case REJECTED -> comment.setStatus(CommentStatus.REJECTED);
+        }
+
+        commentsRepository.save(comment);
+
+        log.info("Status of comment with id={} was changed to {}", commentId, comment.getStatus());
+
+
     }
 
     @Override
@@ -116,6 +160,22 @@ public class CommentsServiceImpl implements CommentsService {
             case "ALL" -> null;
             default -> throw new NotFoundException("Некорректный фильтр по статусу: " + filter);
         };
+
+    public void adminDeleteComment(Long commentId) {
+        Comment comment = checkAndGetComment(commentId);
+
+        commentsRepository.delete(comment);
+
+        log.info("Comment with id={} was deleted", commentId);
+
+    }
+
+    private Comment checkAndGetComment(Long commentId) {
+
+        return commentsRepository.getCommentById(commentId)
+                .orElseThrow(() -> new NotFoundException("Comment with id=" + commentId + " was not found"));
+
+
     }
 
     private void checkUser(Long userId) {
