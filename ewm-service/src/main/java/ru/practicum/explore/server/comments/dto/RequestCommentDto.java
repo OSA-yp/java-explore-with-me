@@ -5,7 +5,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
 @Data
-public class NewCommentDto {
+public class RequestCommentDto {
 
     @NotBlank
     @Length(min = 1, max = 2000)

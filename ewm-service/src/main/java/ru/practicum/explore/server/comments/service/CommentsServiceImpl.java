@@ -6,10 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.explore.server.comments.controller.params.AddCommentParams;
-import ru.practicum.explore.server.comments.controller.params.CommentStatusAction;
-import ru.practicum.explore.server.comments.controller.params.GetAdminCommentsParams;
-import ru.practicum.explore.server.comments.controller.params.GetPublicCommentsParams;
+import ru.practicum.explore.server.comments.controller.params.*;
 import ru.practicum.explore.server.comments.dal.CommentMapper;
 import ru.practicum.explore.server.comments.dal.CommentsRepository;
 import ru.practicum.explore.server.comments.dto.FullCommentResponseDto;
@@ -23,7 +20,9 @@ import ru.practicum.explore.server.exception.NotFoundException;
 import ru.practicum.explore.server.users.service.UserService;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -68,6 +67,28 @@ public class CommentsServiceImpl implements CommentsService {
     }
 
     @Override
+    public FullCommentResponseDto updateComment(UpdateCommentParams params) {
+        Comment comment = checkAndGetComment(params.getCommentId());
+
+        if (!comment.getCommentator().equals(params.getUserId())) {
+            throw new ForbiddenException("Редактировать можно только свои комментарии");
+        }
+        comment.setText(params.getDto().getText());
+        comment.setStatus(CommentStatus.NEW);
+
+        return CommentMapper.toFullCommentResponseDto(commentsRepository.save(comment));
+    }
+
+    @Override
+    public void deleteComment(DeleteCommentParams params) {
+        Comment comment = checkAndGetComment(params.getCommentId());
+
+        if (!comment.getCommentator().equals(params.getUserId())) {
+            throw new ForbiddenException("Удалять можно только свои комментарии");
+        }
+        commentsRepository.delete(comment);
+    }
+
     public Collection<FullCommentResponseDto> getAdminComments(GetAdminCommentsParams params) {
 
         Pageable pageable = PageRequest.of(params.getFrom() / params.getSize(), params.getSize());
@@ -112,9 +133,35 @@ public class CommentsServiceImpl implements CommentsService {
 
         log.info("Status of comment with id={} was changed to {}", commentId, comment.getStatus());
 
+
     }
 
     @Override
+    public List<FullCommentResponseDto> getUserComments(GetUserCommentsParams params) {
+        checkUser(params.getUserId());
+        Pageable pageable = PageRequest.of(params.getFrom() / params.getSize(), params.getSize());
+        CommentStatus status = parseFilter(params.getFilter());
+        List<Comment> comments;
+        if (status == null) {
+            comments = commentsRepository.findAllByCommentator(params.getUserId(), pageable);
+        } else {
+            comments = commentsRepository.findAllByCommentatorAndStatus(params.getUserId(), status, pageable);
+        }
+        return comments.stream()
+                .map(CommentMapper::toFullCommentResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    private CommentStatus parseFilter(String filter) {
+        return switch (filter.toUpperCase()) {
+            case "NEW" -> CommentStatus.NEW;
+            case "PUBLISHED" -> CommentStatus.PUBLISHED;
+            case "REJECTED" -> CommentStatus.REJECTED;
+            case "ALL" -> null;
+            default -> throw new NotFoundException("Некорректный фильтр по статусу: " + filter);
+        };
+    }
+
     public void adminDeleteComment(Long commentId) {
         Comment comment = checkAndGetComment(commentId);
 
@@ -128,6 +175,7 @@ public class CommentsServiceImpl implements CommentsService {
 
         return commentsRepository.getCommentById(commentId)
                 .orElseThrow(() -> new NotFoundException("Comment with id=" + commentId + " was not found"));
+
 
     }
 

@@ -1,7 +1,6 @@
 package ru.practicum.explore.server.comments.dto;
 
 import lombok.Data;
-
 import java.time.LocalDateTime;
 
 @Data

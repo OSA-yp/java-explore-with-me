@@ -53,4 +53,6 @@ public class PublicCommentsController {
 
         return commentsService.getPublicEventComments(params);
     }
+
+
 }

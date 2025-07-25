@@ -4,14 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.explore.server.comments.dto.RequestCommentDto;
 
-@Setter
+
 @Getter
-public class AddCommentParams {
+@Setter
+public class UpdateCommentParams {
 
     private Long userId;
 
-    private Long eventId;
+    private Long commentId;
 
-    private RequestCommentDto requestCommentDto;
-
+    private RequestCommentDto dto;
 }

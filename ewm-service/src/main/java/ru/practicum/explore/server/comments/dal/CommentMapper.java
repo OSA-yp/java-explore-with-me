@@ -54,11 +54,12 @@ public class CommentMapper {
 
         comment.setCommentator(params.getUserId());
         comment.setEvent(params.getEventId());
-        comment.setText(params.getNewCommentDto().getText());
+        comment.setText(params.getRequestCommentDto().getText());
         comment.setCreated(LocalDateTime.now());
         comment.setStatus(CommentStatus.NEW);
 
         return comment;
 
     }
+
 }
