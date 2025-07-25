@@ -2,7 +2,7 @@ package ru.practicum.explore.server.comments.controller.params;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.practicum.explore.server.comments.dto.NewCommentDto;
+import ru.practicum.explore.server.comments.dto.RequestCommentDto;
 
 @Setter
 @Getter
@@ -12,6 +12,6 @@ public class AddCommentParams {
 
     private Long eventId;
 
-    private NewCommentDto newCommentDto;
+    private RequestCommentDto requestCommentDto;
 
 }

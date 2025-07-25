@@ -10,8 +10,7 @@ import ru.practicum.explore.server.comments.controller.params.DeleteCommentParam
 import ru.practicum.explore.server.comments.controller.params.GetUserCommentsParams;
 import ru.practicum.explore.server.comments.controller.params.UpdateCommentParams;
 import ru.practicum.explore.server.comments.dto.FullCommentResponseDto;
-import ru.practicum.explore.server.comments.dto.NewCommentDto;
-import ru.practicum.explore.server.comments.dto.UpdateCommentDto;
+import ru.practicum.explore.server.comments.dto.RequestCommentDto;
 import ru.practicum.explore.server.comments.service.CommentsService;
 
 import java.util.List;
@@ -30,7 +29,7 @@ public class PrivateCommentsController {
     public FullCommentResponseDto addComment(
             @Valid
             @RequestBody
-            NewCommentDto newCommentDto,
+            RequestCommentDto requestCommentDto,
 
             @PathVariable
             Long eventId,
@@ -40,7 +39,7 @@ public class PrivateCommentsController {
 
         AddCommentParams params = new AddCommentParams();
 
-        params.setNewCommentDto(newCommentDto);
+        params.setRequestCommentDto(requestCommentDto);
         params.setEventId(eventId);
         params.setUserId(userId);
 
@@ -57,7 +56,7 @@ public class PrivateCommentsController {
             Long commentId,
 
             @RequestBody @Valid
-            UpdateCommentDto updateCommentDto) {
+            RequestCommentDto updateCommentDto) {
 
         UpdateCommentParams params = new UpdateCommentParams();
         params.setUserId(userId);
@@ -67,7 +66,7 @@ public class PrivateCommentsController {
     }
 
     @DeleteMapping("/comments/{commentId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public void deleteComment(
             @RequestHeader(EWM_USER_HEADER)
             Long userId,

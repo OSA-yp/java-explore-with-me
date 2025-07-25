@@ -1,13 +1,13 @@
 package ru.practicum.explore.server.comments.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 @Data
-public class UpdateCommentDto {
+public class RequestCommentDto {
 
     @NotBlank
-    @Size(min = 1, max = 2000)
-    private String comment;
+    @Length(min = 1, max = 2000)
+    private String text;
 }

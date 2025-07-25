@@ -2,7 +2,7 @@ package ru.practicum.explore.server.comments.controller.params;
 
 import lombok.Getter;
 import lombok.Setter;
-import ru.practicum.explore.server.comments.dto.UpdateCommentDto;
+import ru.practicum.explore.server.comments.dto.RequestCommentDto;
 
 
 @Getter
@@ -13,5 +13,5 @@ public class UpdateCommentParams {
 
     private Long commentId;
 
-    private UpdateCommentDto dto;
+    private RequestCommentDto dto;
 }

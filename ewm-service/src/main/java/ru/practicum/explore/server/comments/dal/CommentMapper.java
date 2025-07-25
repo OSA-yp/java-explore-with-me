@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import ru.practicum.explore.server.comments.controller.params.AddCommentParams;
 import ru.practicum.explore.server.comments.dto.FullCommentResponseDto;
 import ru.practicum.explore.server.comments.dto.PublicCommentResponseDto;
-import ru.practicum.explore.server.comments.dto.UpdateCommentDto;
 import ru.practicum.explore.server.comments.model.Comment;
 import ru.practicum.explore.server.comments.model.CommentStatus;
 
@@ -55,7 +54,7 @@ public class CommentMapper {
 
         comment.setCommentator(params.getUserId());
         comment.setEvent(params.getEventId());
-        comment.setText(params.getNewCommentDto().getText());
+        comment.setText(params.getRequestCommentDto().getText());
         comment.setCreated(LocalDateTime.now());
         comment.setStatus(CommentStatus.NEW);
 
@@ -63,7 +62,4 @@ public class CommentMapper {
 
     }
 
-    public static void updateDto(Comment comment, UpdateCommentDto updateCommentDto) {
-
-    }
 }

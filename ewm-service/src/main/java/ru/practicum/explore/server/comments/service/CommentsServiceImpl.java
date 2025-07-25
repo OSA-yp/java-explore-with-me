@@ -68,12 +68,12 @@ public class CommentsServiceImpl implements CommentsService {
 
     @Override
     public FullCommentResponseDto updateComment(UpdateCommentParams params) {
-        Comment comment = commentsRepository.findById(params.getCommentId())
-                .orElseThrow(() -> new NotFoundException("Комментарий не найден"));
+        Comment comment = checkAndGetComment(params.getCommentId());
+
         if (!comment.getCommentator().equals(params.getUserId())) {
             throw new ForbiddenException("Редактировать можно только свои комментарии");
         }
-        comment.setText(params.getDto().getComment());
+        comment.setText(params.getDto().getText());
         comment.setStatus(CommentStatus.NEW);
 
         return CommentMapper.toFullCommentResponseDto(commentsRepository.save(comment));
@@ -81,13 +81,13 @@ public class CommentsServiceImpl implements CommentsService {
 
     @Override
     public void deleteComment(DeleteCommentParams params) {
-        Comment comment = commentsRepository.findById(params.getCommentId())
-                .orElseThrow(() -> new NotFoundException("Комментарий не найден"));
+        Comment comment = checkAndGetComment(params.getCommentId());
 
         if (!comment.getCommentator().equals(params.getUserId())) {
             throw new ForbiddenException("Удалять можно только свои комментарии");
         }
         commentsRepository.delete(comment);
+    }
 
     public Collection<FullCommentResponseDto> getAdminComments(GetAdminCommentsParams params) {
 
@@ -160,6 +160,7 @@ public class CommentsServiceImpl implements CommentsService {
             case "ALL" -> null;
             default -> throw new NotFoundException("Некорректный фильтр по статусу: " + filter);
         };
+    }
 
     public void adminDeleteComment(Long commentId) {
         Comment comment = checkAndGetComment(commentId);
