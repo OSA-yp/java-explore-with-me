@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
         log.info("User with id={} was deleted", userId);
     }
 
-    private void checkUser(Long userId) {
+    public void checkUser(Long userId) {
 
         Optional<User> maybeUser = userRepository.getUserById(userId);
 
