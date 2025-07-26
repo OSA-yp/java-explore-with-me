@@ -22,30 +22,23 @@ public class PublicCommentsController {
     @GetMapping("/events/{eventId}/comments")
     @ResponseStatus(HttpStatus.OK)
     public Collection<PublicCommentResponseDto> getEventComments(
-
             @PathVariable
             Long eventId,
-
             @Valid
             @RequestParam(name = "from", defaultValue = "0", required = false)
             Integer from,
-
             @Valid
             @RequestParam(name = "size", defaultValue = "10", required = false)
             Integer size) {
-
 
         log.info("Запрос публичных событий: eventId={}, from={}, size={}", eventId, from, size);
 
         if (size < 1) {
             throw new ValidationException("Size parameter must be >=1");
         }
-
         if (from < 0) {
             throw new ValidationException("From parameter must be >=0");
         }
-
-
         GetPublicCommentsParams params = new GetPublicCommentsParams();
         params.setEventId(eventId);
         params.setFrom(from);

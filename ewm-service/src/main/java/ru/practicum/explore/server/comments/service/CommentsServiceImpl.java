@@ -37,14 +37,11 @@ public class CommentsServiceImpl implements CommentsService {
     public Collection<PublicCommentResponseDto> getPublicEventComments(GetPublicCommentsParams params) {
 
         checkEvent(params.eventId);
-
         Pageable pageable = PageRequest.of(params.getFrom() / params.getSize(), params.getSize());
-
         Page<Comment> comments = commentsRepository.findByEventAndStatusOrderByPublishedDesc(
                 params.eventId,
                 CommentStatus.PUBLISHED,
                 pageable);
-
         return comments.stream()
                 .map(CommentMapper::toPublicCommentResponseDto)
                 .toList();
@@ -56,9 +53,7 @@ public class CommentsServiceImpl implements CommentsService {
         checkUser(params.getUserId());
         checkEvent(params.getEventId(), params.getUserId());
 
-
         Comment comment = CommentMapper.toComment(params);
-
         Comment newComment = commentsRepository.save(comment);
 
         log.info("Comment with id={} was created", newComment.getId());
@@ -70,9 +65,9 @@ public class CommentsServiceImpl implements CommentsService {
     public FullCommentResponseDto updateComment(UpdateCommentParams params) {
         Comment comment = checkAndGetComment(params.getCommentId());
 
-        if (!comment.getCommentator().equals(params.getUserId())) {
-            throw new ForbiddenException("Редактировать можно только свои комментарии");
-        }
+        checkUserForHimSelf(comment.getCommentator(), params.getUserId(),
+                "Редактировать можно только свои комментарии");
+
         comment.setText(params.getDto().getText());
         comment.setStatus(CommentStatus.NEW);
 
@@ -81,11 +76,12 @@ public class CommentsServiceImpl implements CommentsService {
 
     @Override
     public void deleteComment(DeleteCommentParams params) {
+
         Comment comment = checkAndGetComment(params.getCommentId());
 
-        if (!comment.getCommentator().equals(params.getUserId())) {
-            throw new ForbiddenException("Удалять можно только свои комментарии");
-        }
+        checkUserForHimSelf(comment.getCommentator(), params.getUserId(),
+                "Удалять можно только свои комментарии");
+
         commentsRepository.delete(comment);
     }
 
@@ -130,10 +126,7 @@ public class CommentsServiceImpl implements CommentsService {
         }
 
         commentsRepository.save(comment);
-
         log.info("Status of comment with id={} was changed to {}", commentId, comment.getStatus());
-
-
     }
 
     @Override
@@ -166,17 +159,13 @@ public class CommentsServiceImpl implements CommentsService {
         Comment comment = checkAndGetComment(commentId);
 
         commentsRepository.delete(comment);
-
         log.info("Comment with id={} was deleted", commentId);
-
     }
 
     private Comment checkAndGetComment(Long commentId) {
 
         return commentsRepository.getCommentById(commentId)
                 .orElseThrow(() -> new NotFoundException("Comment with id=" + commentId + " was not found"));
-
-
     }
 
     private void checkUser(Long userId) {
@@ -185,13 +174,11 @@ public class CommentsServiceImpl implements CommentsService {
         userService.checkUser(userId);
     }
 
-
     private EventFullDto checkEvent(Long eventId) {
 
         // проверка на существование события на стороне сервиса событий
         // так как получаются только опубликованные события, то для всех остальных будет 404
         return publicEventService.getPublicEventById(eventId);
-
     }
 
     private void checkEvent(Long eventId, Long userId) {
@@ -201,6 +188,12 @@ public class CommentsServiceImpl implements CommentsService {
         if (Objects.equals(userId, event.getInitiator().getId())) {
             throw new ForbiddenException("Комментировать можно только чужие события");
         }
+    }
 
+    private void checkUserForHimSelf(Long user1Id, Long user2Id, String errorText) {
+
+        if (!user1Id.equals(user2Id)) {
+            throw new ForbiddenException(errorText);
+        }
     }
 }
